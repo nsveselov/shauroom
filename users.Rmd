@@ -20,24 +20,27 @@ library(lubridate)
 ```{r information by id}
 source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R") 
 vk <- get.vk.connector(code = "7f2ba74370408f5ca3", app = "karepin", debug = T)
+charset <- "utf-8"
 users.get <- function(vk.get_data, user_ids, fields = "sex,bdate,city,country,home_town,education,universities,schools,counters,occupation,relation,personal") {
   method = "users.get"
   assert_that(!is.null(user_ids))
   assert_that(is.character(user_ids))
   assert_that(length(user_ids) == 1)
-  assert_that(length(str_split(user_ids, pattern = ",")[[1]]) <= 1000)
+  assert_that(length(str_split(user_ids, pattern = ",")[[1]]) <= 15000)
   assert_that(is.character(fields))
   assert_that(length(fields) == 1)
   Sys.sleep(1)
   print("Getting data...")
   return(vk.get_data(method=method, user_ids = user_ids, fields = fields))
 } #параметры fields можно менять (https://vk.com/dev/fields), правда список инфы,что там предлагают не особо радует
-user_ids<-'59138821,141155,1' #по такому же примеру нужно составить список id голосовавших
-users.get(vk,user_ids) 
-json=users.get(vk,user_ids) #код
+user_ids<-'59138821,141155' #по такому же примеру нужно составить список id голосовавших
+
+j<-users.get(vk,as.character(user_ids)) 
+json<-users.get(vk,user_ids)
 profiles = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})
 profiles = do.call(plyr::rbind.fill, profiles) 
 profiles = as.data.frame(profiles, stringsAsFactors = FALSE) 
+
 ```
 
 ```{r making list of IDs}
@@ -45,6 +48,7 @@ full<-read.csv("~/shaverma_df_light.csv")
 ids<-as.data.frame(full$reviewer_id)
 
 ids<-as.data.frame(ids[!duplicated(ids),])
+ids<-top_n(ids,1000)
 names(ids) <- c("id")
 ids$id<- removePunctuation(as.character(ids$id))
 
@@ -57,9 +61,120 @@ print(at$user_ids)
 names(at)<-c(NULL)
 user_ids=paste(at[1], sep = ",")
 print(user_ids)
-write(user_ids) #по логике, этот док подойдет, но нужно в нем убрать ENTERы все, которые ctrl+F не находит, или по другому состряпать его
+write(user_ids, Encoding('UTF-8')) #по логике, этот док подойдет, но нужно в нем убрать ENTERы все, которые ctrl+F не находит, или по другому состряпать его
 user_ids="~/sss/shauroom/data" #не могу загрузить попробовать
 user_ids=data("~/sss/shauroom/data") 
 user_ids="36311,53927,8269,2781,51773,19112,16774,30234,58561,22610,37177,49971,40313,5634,9953,9593,7611,43041,10481,7109,19853,13656,32938,44153,1334,41552,32026,47066,24974,13474,37472,34138,50185,6555,53509,5498,46658,43523,26911,42449,54223,32430,30644,8459,48647,15165,28679,38844,6597,16550,27157,47846,8943,39547,59845,36043,8515,14520,16705,5394,54627,53684,45193,57915,59778,46554,43408,22588,51308,19315,14712,52503,8912,25009,37987,40631,58935,60450,49763,53230,35990,11759,59858,17502,45941,50900,44696,55536,4012,39068,25710,23735,41556,25604,15348,45019,21785,57240,52438,43431,2408,47454,50862,55540,26960,5366,10534,21453,26747,56572,5266,54082,54346,43980,49080,44677,16307,41760,46204,32825,55143,25004,50873,53133,43995,52793,35161,43602,38002,16752,16678,41423,19297,19461,21547,6126,13787,31105,5871,59475,50415,54802,50338,41309,57687,2761,35092,60880,26016,41313,1245,18823,18644,45124,20149,53937,42736,24052,34568,2591,29377,45639,5696,42835,53832,19080,49454,7906,21394,50755,54952,58594,53805,4218,62,48027,44647,15381,49579,60304,33804,28612,59431,7280,59143,46092,19190,36504,60342,46441,35896,48202,58683,56186,3976,52578,47706,60826,16962,46868,109,46959,20963,60834,56344,6862,639,23050,18605,41848,6751,40337,36086,44200,26935," #просто чекнул, что будет работать в таком виде
+Encoding(user_ids)
+```
+
+```{r}
+a<-(1:1000)
+user_ids<-paste(a, sep = ",")
+```
+
+```{r trying script}
+profiles<-NULL
+get_df<- function(x)
+{profiles = sapply(1:length(x), function(z){as.data.frame(t(unlist(x[[z]])))})
+profiles = do.call(plyr::rbind.fill, profiles) 
+profiles = as.data.frame(profiles, stringsAsFactors = FALSE) }
+df<-get_df(json)
+df<-NULL
+json<- NULL
+profiles<- NULL
+for(z in 2:97) {
+a<- paste(ids[(10*z):(10*z+10),c('id')], sep = ",")
+}
+
+}
+?separate
+a<-paste(ids[10:20,c('id')], sep = ",")
+
+
+a<-read.csv("~/sss/shauroom/ids.csv")
+writeLines(a$id, sep = ",")
+writel
+list = str(ids)split(",")
+
+
+user_ids<- paste(b$id, sep = ",")
+text<- ""
+b<-ids
+all<-top_n(profiles,1)
+profiles<-NULL
+tab<- function(json){prof = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})}
+#нужно несколько id
+
+user_ids<- paste(b[1,c('id')],',',b[2,c('id')]) ###
+user_ids<-gsub(" ", "", user_ids, fixed = TRUE)
+
+for(i in 2:5){
+  user_ids<-paste(b[i, c('id')])
+  json<-users.get(vk,user_ids)
+  profiles = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})
+  profiles = do.call(plyr::rbind.fill, profiles) 
+  profiles = as.data.frame(profiles, stringsAsFactors = FALSE)
+  all<-rbind(all[1:(i-1)], profiles[1, c('id')])
+}
+tabl<- function(prof){do.call(plyr::rbind.fill, prof)
+}
+}
+
+all<- rbind(profiles[1:(i)], a)
+existingDF <- rbind(existingDF[1:r,],newrow,existingDF[-(1:r),])
+
+prof = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})
+
+tab<- function(json){prof = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})}
+tab(json)
+prof = sapply(1:length(json), tab(json))
+```
+
+```{r}
+user_ids<-'59138821'
+user_ids<- paste(user_ids,b[1,c('id')],',',b[2,c('id')]) ###
+user_ids<-gsub(" ", "", user_ids, fixed = TRUE)
+
+for (i in 1:350) {
+  user_ids<- paste(user_ids,',',as.character(b[i,c('id')]))
+}
+user_ids<-gsub(" ", "", user_ids, fixed = T)
+all<-rbind.data.frame(all, profiles)
+all<-left_join(all,profiles, by="uid")
+first<-profiles
+second<-profiles
+all<-merge(first,second,all=T)
+user_ids<-as.character(b[2,c('id')])
+```
+
+```{r}
+all<- NULL
+for (q in 1:10){ #174 
+  user_ids<-'1'
+    for (i in 1:350) {
+      
+    user_ids<- paste(user_ids,',',as.character(ids[((q-1)*350+i),c('id')]))
+    }
+    user_ids<-gsub(" ", "", user_ids, fixed = T)
+    json<-users.get(vk,user_ids)
+    profiles = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})
+    profiles = do.call(plyr::rbind.fill, profiles) 
+    profiles = as.data.frame(profiles, stringsAsFactors = FALSE) 
+    new<- profiles
+    all<-merge(all,new,all=T)
+  all<-unique(all)
+  
+}
+
+alle<-all
+alle<- unique(all)
+write.csv(all, "users.csv")
+triz<-all
+vos<-all
+sto<-all
+a<-read.csv("~/sss/users.csv")
+class(a$uid)
+alle$uid<-as.numeric(alle$uid)
 ```
 
