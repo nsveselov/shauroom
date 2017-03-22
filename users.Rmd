@@ -85,9 +85,25 @@ class(a$uid)
 alle$uid<-as.numeric(alle$uid)
 ```
 
-```{r попытки инфы по группам}
-users.get <- function(vk.get_data, user_ids, fields = "sex,bdate,city,country,home_town,education,universities,schools,counters,occupation,relation,personal") {
-  method = "users.get"
+
+```{r наброски кода для группировки пользователей/удобоваримости в общем}
+members<-top_n(all,1000)
+all$sex <- ifelse(all$sex==1, 'F', 'M')
+sex <- table(na.omit(members$sex))
+
+# данные для группировки по возрасту (не смотрел)
+age_intervals <- c(16, 21, 26, 31, 36, 41)
+age_names <- c('<16', '16-20', '21-25', '26-30', '31-35', '36-40', '40>')
+age_bins = table(findInterval(na.pass(members$age), age_intervals))
+names(age_bins) <- age_names
+# посмотрим на данные
+sex
+
+```
+
+```{r попытки поиска инфы по группам}
+subs.get <- function(vk.get_data, user_ids, extended, fields = "id,name") {
+  method = "users.getSubscriptions"
   assert_that(!is.null(user_ids))
   assert_that(is.character(user_ids))
   assert_that(length(user_ids) == 1)
