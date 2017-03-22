@@ -169,7 +169,7 @@ for (q in 1:10){ #174
 
 alle<-all
 alle<- unique(all)
-write.csv(all, "users.csv")
+write.csv(all, "Users.csv")
 triz<-all
 vos<-all
 sto<-all
