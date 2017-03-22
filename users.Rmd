@@ -36,6 +36,7 @@ users.get <- function(vk.get_data, user_ids, fields = "sex,bdate,city,country,ho
 } #параметры fields можно менять (https://vk.com/dev/fields), правда список инфы,что там предлагают не особо радует
 #переменные
 full<-read.csv("~/shaverma_df_light.csv")
+# full<-read.csv("~/shaverma/shauroom/shaverma_df_light.csv")       # для Руслана
 ids<-as.data.frame(full$reviewer_id)
 ids<-as.data.frame(ids[!duplicated(ids),])
 names(ids) <- c("id")
@@ -105,5 +106,42 @@ json<-users.get(vk,user_ids)
 profiles = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})
 profiles = do.call(plyr::rbind.fill, profiles) 
 profiles = as.data.frame(profiles, stringsAsFactors = FALSE) 
+```
+
+```{r}
+
+#### как получать токен, его нужно обязательно получить, иначе мой код не будет работать ####
+r <- GET("https://oauth.vk.com/access_token?client_id=5931348&client_secret=TNErTj22HPljiUMRoCOK&redirect_uri=https://oauth.vk.com/blank.html&code=d4a0098b279bc47555")
+content(r, "text")
+my_token = "ff635f4744c387ca2ee9bfe8ed3f79a62b82b828113fc7db1c71f04e7722345007e9a439b5128a99d1409"
+
+
+
+####### как быстро нарезать айдишники наших юзеров на блоки текста по 998 элементов ########
+offset = 1
+delta = 999
+while (offset < length(ids$id)){
+  print(paste(ids$id[offset:delta], collapse = ","))
+  offset = offset + 999
+  delta = delta + 999
+}
+
+
+
+######################### как вытаскивать паблики ###############################
+
+# нужно придумать, как из t делать список и как этот список закидывать в user.csv (туда, где хранятся все данные на юзеров)
+
+# тест ::: 20 первых юзеров
+for (i in ids$id[1:20]){
+  url <- paste('https://api.vk.com/method/users.getSubscriptions?user_id=', i, "&extended=0&fields=id,name", "&v=5.62", "access_token=", my_token, sep = "")
+  t <- GET(url)
+  str(content(t, "parsed"))}
+
+# бой ::: все юзеры
+for (i in ids$id){
+  url <- paste('https://api.vk.com/method/users.getSubscriptions?user_id=', i, "&extended=0&fields=id,name", "&v=5.62", "access_token=", my_token, sep = "")
+  t <- GET(url)
+  str(content(t, "parsed"))}
 ```
 
