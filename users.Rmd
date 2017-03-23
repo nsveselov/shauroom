@@ -176,23 +176,43 @@ alll<-merge(a,b,all=T)
 all<-separate(alll, col='g', into=c("uid","groups"), sep=":,")
 ```
 
+```{r первоначальный датафрейм}
+user_id='122135'
+  url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
+  url<-gsub(" ", "", url, fixed = T)
+  json<-getURL(url)
+  new<-fromJSON(json)
+  a=c(new$response$groups$items)
+  one<-as.data.frame(a)
+  groupsone<-paste(user_id,':')
+  for (i in 1:new$response$groups$count) {
+      
+    groupsone<- paste(groupsone,',',as.character(one[i,1]))
+  } 
+  groupsone<-gsub(" ", "", groupsone, fixed = T)
+  a<-c(groupsone)
+  b<-as.data.frame(a)
+  all<-separate(b, col='a', into=c("reviewer_id","groups"), sep=":,")
+
+```
 
 
-```{r без мусора}
-#вроде не нужно, но если крашит выполните до 183 строки
+```{r без мусора (работает)}
+#вроде не нужно, но если крашит выполните до vkoauth
 source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R")
 vk <- get.vk.connector(code = "e43b1ea274c0171622", app = "karepin", debug = T) 
 setAccessToken(access_token='69ca258bb19616bdd56ed531725746c8cb56ebf1a4b2fdbadedc260ef1a13adc7a4e325ee2d3fa38a5cae')
 vkOAuth(5585217, 'groups', 'логинВК', 'пароль')
 #собсна начало
-full<-read.csv("~/shaverma_df_light.csv")
-ids<-as.data.frame(full$reviewer_id)
-ids<-unique(ids)
+ids<-read.csv("~/sss/shauroom/un_ids_filtered.csv")
+ids$X<-NULL
 names(ids) <- c("id")
 ids$id<- removePunctuation(as.character(ids$id))
 ids$id<- as.character(ids$id)
 all<-alll
-for (z in 1:3) {
+
+
+for (z in 1:1000) {
   user_id=as.character(ids[z,1])
   url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
   url<-gsub(" ", "", url, fixed = T)
@@ -208,11 +228,14 @@ for (z in 1:3) {
   groupsone<-gsub(" ", "", groupsone, fixed = T)
   a<-c(groupsone)
   b<-as.data.frame(a)
-  alll<-separate(b, col='a', into=c("uid","groups"), sep=":,")
-  all<-merge(all,alll,all=T)
+  alll<-separate(b, col='a', into=c("reviewer_id","groups"), sep=":,")
+  all<-merge(alll,all,all=T)
   all<-unique(all)
 }
-=======
+
+#если вдруг понадобится каждая группа отдельно
+a=c(user_id,new$response$groups$items)
+  one<-as.data.frame(t(a))
 ```
 
 ```{r}
