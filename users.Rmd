@@ -176,6 +176,12 @@ all<-separate(alll, col='g', into=c("uid","groups"), sep=":,")
 
 ```
 ```{r без мусора}
+#вроде не нужно, но если крашит выполните до 183 строки
+source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R")
+vk <- get.vk.connector(code = "e43b1ea274c0171622", app = "karepin", debug = T) 
+setAccessToken(access_token='69ca258bb19616bdd56ed531725746c8cb56ebf1a4b2fdbadedc260ef1a13adc7a4e325ee2d3fa38a5cae')
+vkOAuth(5585217, 'groups', 'логинВК', 'пароль')
+#собсна начало
 full<-read.csv("~/shaverma_df_light.csv")
 ids<-as.data.frame(full$reviewer_id)
 ids<-unique(ids)
