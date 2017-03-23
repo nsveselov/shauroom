@@ -17,7 +17,6 @@ library(RJSONIO)
 library(lubridate)
 ```
 
-
 ```{r загрузка функций}
 #не запускайте полностью чанк, это плохая идея, долго оч
 source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R") 
@@ -86,7 +85,6 @@ class(a$uid)
 us$uid<-as.numeric(us$uid)
 ```
 
-
 ```{r наброски кода для группировки пользователей/удобоваримости в общем}
 members<-top_n(all,1000)
 all$sex <- ifelse(all$sex==1, 'F', 'M')
@@ -124,60 +122,8 @@ profiles = do.call(plyr::rbind.fill, profiles)
 profiles = as.data.frame(profiles, stringsAsFactors = FALSE) 
 ```
 
-<<<<<<< HEAD
-```{r just tryna}
-#сотри пароль
-source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R")
-vk <- get.vk.connector(code = "e43b1ea274c0171622", app = "karepin", debug = T) 
-setAccessToken(access_token='69ca258bb19616bdd56ed531725746c8cb56ebf1a4b2fdbadedc260ef1a13adc7a4e325ee2d3fa38a5cae')
-vkOAuth(5585217, 'groups', 'логинВК', 'пароль')
-fromJSON(getURL('https://api.vk.com/method/users.getSubscriptions?user_id=10644545'))
-user_id<-"10644545"
-
-
-##########для долгого скрипта
-user_id<-'21321'
-url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
-url<-gsub(" ", "", url, fixed = T)
-json<-getURL(url)
-new<-fromJSON(json)
-a=c(user_id,new$response$groups$items)
-
-###оставь
-one<-as.data.frame(t(a))
-two<-as.data.frame(t(a))
-all<-merge(one,two,all=TRUE)
-##########для долгого скрипта
-groups=paste(new$response$groups$items, sep = ",")
-user_id<-'21321'
-url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
-url<-gsub(" ", "", url, fixed = T)
-json<-getURL(url)
-new<-fromJSON(json)
-a=c(user_id,paste(new$response$groups$items))
-b<-paste(new$response$groups$items,sep = ",")
-
-groupsone<-one
-rownames()
-groupsone<-paste(user_id,':')
-
-for (i in 1:new$response$groups$count) {
-      
-    groupsone<- paste(groupsone,',',as.character(one[1,i]))
-    } 
-groupsone<-gsub(" ", "", groupsone, fixed = T)
-a<-c(groupsone)
-b<-c(groupstwo)
-a<-as.data.frame(a)
-names(a) <- c("g")
-b<-as.data.frame(b)
-names(b)<-c("g")
-alll<-merge(a,b,all=T)
-all<-separate(alll, col='g', into=c("uid","groups"), sep=":,")
-```
-
 ```{r первоначальный датафрейм}
-user_id='122135'
+user_id='12215'
   url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
   url<-gsub(" ", "", url, fixed = T)
   json<-getURL(url)
@@ -196,7 +142,6 @@ user_id='122135'
 
 ```
 
-
 ```{r без мусора (работает)}
 #вроде не нужно, но если крашит выполните до vkoauth
 source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R")
@@ -209,10 +154,9 @@ ids$X<-NULL
 names(ids) <- c("id")
 ids$id<- removePunctuation(as.character(ids$id))
 ids$id<- as.character(ids$id)
-all<-alll
-
 
 for (z in 1:1000) {
+  print(z)
   user_id=as.character(ids[z,1])
   url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
   url<-gsub(" ", "", url, fixed = T)
@@ -238,6 +182,24 @@ groups$X<-NULL
 #если вдруг понадобится каждая группа отдельно
 a=c(user_id,new$response$groups$items)
   one<-as.data.frame(t(a))
+```
+
+```{r для list}
+group<-data.frame()
+group<-NULL
+user_id<-"122135"
+
+for (z in 560:565) {
+  print(z)
+  user_id=as.character(ids[z,1])
+  url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
+  url<-gsub(" ", "", url, fixed = T)
+  json<-getURL(url)
+  new<-fromJSON(json)
+  list <- list(c(new$response$groups$items))
+  group[z, "user_id"] = ids$id[z]
+  group[z, "publics"] = I(list(list))
+}
 ```
 
 ```{r}
@@ -277,5 +239,6 @@ for (i in seq(1, length(ids$id), by = 1)){
 # можем итерировать списки пабликов
 group[5, "publics"][[1]]        # запрос всех пабликов
 group[5, "publics"][[1]][1]     # запрос конкретного паблика
+
 ```
 
