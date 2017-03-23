@@ -174,9 +174,10 @@ b<-as.data.frame(b)
 names(b)<-c("g")
 alll<-merge(a,b,all=T)
 all<-separate(alll, col='g', into=c("uid","groups"), sep=":,")
-
-
 ```
+
+
+
 ```{r без мусора}
 #вроде не нужно, но если крашит выполните до 183 строки
 source_url("https://gist.githubusercontent.com/paulokopny/63daf8ca42f9d842b122/raw/bf7c8f9f6944b44e7c791cb66f4919bd762f4dc9/vk.R")
@@ -212,6 +213,8 @@ for (z in 1:3) {
   all<-unique(all)
 }
 =======
+```
+
 ```{r}
 
 #### как получать токен, его нужно обязательно получить, иначе мой код не будет работать ####
