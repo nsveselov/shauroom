@@ -262,19 +262,20 @@ while (offset < length(ids$id)){
 
 ######################### как вытаскивать паблики ###############################
 
-# нужно придумать, как из t делать список и как этот список закидывать в user.csv (туда, где хранятся все данные на юзеров)
-
-# тест ::: 20 первых юзеров
-for (i in ids$id[1:20]){
-  url <- paste('https://api.vk.com/method/users.getSubscriptions?user_id=', i, "&extended=0&fields=id,name", "&v=5.62", "access_token=", my_token, sep = "")
-  t <- GET(url)
-  str(content(t, "parsed"))}
-
-# бой ::: все юзеры
-for (i in ids$id){
-  url <- paste('https://api.vk.com/method/users.getSubscriptions?user_id=', i, "&extended=0&fields=id,name", "&v=5.62", "access_token=", my_token, sep = "")
-  t <- GET(url)
-  str(content(t, "parsed"))}
->>>>>>> 22a7fa82a0b1a8b15cb7c5b0a95919f929673a95
+# скрипт, записываем в group
+group = data.frame()
+# чтобы запрашивать только часть, нужно в 268 строке написать, например length(ids$id[1:20]) для запроса первых 20-ти юзеров
+for (i in seq(1, length(ids$id), by = 1)){
+  print(i)
+  url <- paste('https://api.vk.com/method/users.getSubscriptions?user_id=', ids$id[i], "&extended=0&fields=id,name", "&v=5.62", "access_token=", my_token, sep = "")
+  zapros <- getURL(url)
+  json <- fromJSON(zapros)
+  list <- list(json$response$groups$items)
+  group[i, "user_id"] = ids$id[i]
+  group[i, "publics"] = I(list(list))
+}
+# можем итерировать списки пабликов
+group[5, "publics"][[1]]        # запрос всех пабликов
+group[5, "publics"][[1]][1]     # запрос конкретного паблика
 ```
 
