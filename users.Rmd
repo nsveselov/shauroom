@@ -229,7 +229,7 @@ ids_30K <- read.csv("~/shaverma/shauroom/un_ids_filtered.csv")
 # скрипт, записываем в group
 interesting_pages = data.frame()
 # чтобы запрашивать только часть, нужно в 268 строке написать, например length(ids$id[1:20]) для запроса первых 20-ти юзеров
-for (i in seq(1, length(ids_30K$reviewer_id[1:20]), by = 1)){
+for (i in seq(1, length(ids_30K$reviewer_id), by = 1)){
   print(i)
   url <- paste('https://api.vk.com/method/users.getSubscriptions?user_id=', ids_30K$reviewer_id[i], "&extended=0&fields=id,name", "&v=5.62", "access_token=", my_token, sep = "")
   zapros <- getURL(url)
@@ -253,21 +253,26 @@ append(interesting_pages[5, "publics"][[1]], interesting_pages[6, "publics"][[1]
 
 # получаем список уникальных пабликов
 all_publics = interesting_pages[1, "publics"][[1]]
-for (i in seq(2, length(ids_30K$reviewer_id[1:20]), by = 1)){
+for (i in seq(2, length(ids_30K$reviewer_id), by = 1)){
   all_publics = append(all_publics, interesting_pages[i, "publics"][[1]])
 }
 unique_publics <- unique(all_publics)
+df_unique_publics_freq <- as.data.frame(unlist(all_publics)) %>% group_by(unlist(all_publics)) %>% summarise(freq = n())
+df_unique_publics_freq_wotill100 <- df_unique_publics_freq %>% filter(freq > 500)
+
 
 ### не решена проблема с челом, у которого 2980 подписок
 
 # создаем датафрейм, в котором столбцы - id пабликов
 df_publics_for_knn <- data.frame(reviewer_id = interesting_pages$user_id)
-for (i in unique_publics){
+for (i in df_unique_publics_freq_wotill100$`unlist(all_publics)`){
+  #print(i)
   df_publics_for_knn[paste(i, sep = "")] <- NA
 }
 
 # делаем финальную таблицу для knn
 for (i in seq(1, length(interesting_pages$user_id), by = 1)){
+  print(i)
   for (item in interesting_pages[i, "publics"][[1]]){
     for (col in colnames(df_publics_for_knn)[2:dim(df_publics_for_knn)[2]]){
       #print(item)
@@ -277,6 +282,9 @@ for (i in seq(1, length(interesting_pages$user_id), by = 1)){
     }
   }
 }
-  
+ 
+df_publics_for_knn$count <- rowSums(df_publics_for_knn[,2:747])
+df_publics_for_knn[is.na(df_publics_for_knn)] <- 0
+
 ```
 
