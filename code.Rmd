@@ -19,6 +19,10 @@ o$оценка<-gsub("78","7",o$оценка,fixed = T)
 o$оценка<-gsub("77","7",o$оценка,fixed = T)
 o$оценка<-gsub(".9","9",o$оценка,fixed = T)
 o$оценка<-as.numeric(o$оценка)
-o$two<-NULL
+check$оценка1<-o$оценка
+
+check$X<-NULL
 #одну оценку потерял, остальные вроде сходятся
+write.csv(check,"dfcheck.csv")
+
 ```
