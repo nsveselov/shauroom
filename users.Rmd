@@ -100,28 +100,6 @@ sex
 
 ```
 
-```{r попытки поиска инфы по группам}
-subs.get <- function(vk.get_data, user_ids, extended, fields = "id,name") {
-  method = "users.getSubscriptions"
-  assert_that(!is.null(user_ids))
-  assert_that(is.character(user_ids))
-  assert_that(length(user_ids) == 1)
-  assert_that(length(str_split(user_ids, pattern = ",")[[1]]) <= 15000)
-  assert_that(is.character(fields))
-  assert_that(length(fields) == 1)
-  Sys.sleep(1)
-  print("Getting data...")
-  return(vk.get_data(method=method, user_ids = user_ids, fields = fields))
-} #параметры fields можно менять (https://vk.com/dev/fields), правда список инфы,что там предлагают не особо радует
-user_ids<-'59138821,141155' #по такому же примеру нужно составить список id голосовавших
-
-j<-users.get(vk,as.character(user_ids)) 
-json<-users.get(vk,user_ids)
-profiles = sapply(1:length(json), function(z){as.data.frame(t(unlist(json[[z]])))})
-profiles = do.call(plyr::rbind.fill, profiles) 
-profiles = as.data.frame(profiles, stringsAsFactors = FALSE) 
-```
-
 ```{r первоначальный датафрейм}
 user_id='12215'
   url<- paste('https://api.vk.com/method/users.getSubscriptions?user_id=',user_id)
@@ -287,4 +265,3 @@ df_publics_for_knn$count <- rowSums(df_publics_for_knn[,2:747])
 df_publics_for_knn[is.na(df_publics_for_knn)] <- 0
 
 ```
-
