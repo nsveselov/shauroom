@@ -44,12 +44,12 @@ f<-as.data.frame(unlist(json))
 ```
 
 ```{r}
-id="-94119361_393180663"
-=-94119361_393180663&params[extended]=0&params[photo_sizes]=0&params[v]=5.63
-url <- paste('https://api.vk.com/method/photos.getById?photos=', id, "&extended=0", "&photo_sizes=0&v=5.62", "access_token=", my_token, sep = "")
+id="1_129207899_220df2876123d3542f"
+id="-94119361_393180663" # фото у когорого надо достать геолокацию
+url <- paste('https://api.vk.com/method/photos.getById?photos=', id, "&extended=0", "&photo_sizes=0&v=5.62", "access_token=",my_token , sep = "")
   json<-GET(url)
-  #и вручную посморти, есть ли инфа по координатам
-  new<-fromJSON(json)
-  json
+  #и вручную посмортите, есть ли инфа по координатам
+  json$content
+  json$request$fields
 ```
 
