@@ -28,3 +28,14 @@ write.csv(check,"dfcheck.csv")
 #потерял оценку для id 16180
 
 ```
+
+```{r}
+vasy<-read.csv("~/sss/shauroom/vasy_shava.csv")
+geo$<-vasy$geo.coordinates
+geo$id<-vasy$id
+geo<-as.data.frame(geo)
+geo$cords<-vasy$geo.coordinates,
+geo$cords1<-vasy$geo
+f<-GET(as.character(vasy[715,28]))
+```
+
