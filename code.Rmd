@@ -36,6 +36,20 @@ geo$id<-vasy$id
 geo<-as.data.frame(geo)
 geo$cords<-vasy$geo.coordinates,
 geo$cords1<-vasy$geo
-f<-GET(as.character(vasy[715,28]))
+json<-GET(as.character(vasy[715,28]))
+json<-GET("https://vk.com/wall-94119361_16144?z=photo-94119361_393180663%2Fwall-94119361_16144")
+f<-fromJSON(json)
+f<-as.data.frame(unlist(json))
+  fa<-json$request
+```
+
+```{r}
+id="-94119361_393180663"
+=-94119361_393180663&params[extended]=0&params[photo_sizes]=0&params[v]=5.63
+url <- paste('https://api.vk.com/method/photos.getById?photos=', id, "&extended=0", "&photo_sizes=0&v=5.62", "access_token=", my_token, sep = "")
+  json<-GET(url)
+  #и вручную посморти, есть ли инфа по координатам
+  new<-fromJSON(json)
+  json
 ```
 
