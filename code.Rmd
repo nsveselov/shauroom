@@ -26,9 +26,10 @@ check$X<-NULL
 #одну оценку потерял, остальные вроде сходятся
 write.csv(check,"dfcheck.csv")
 #потерял оценку для id 16180
-
+write.csv(all, "ex.csv")
+all<-
 ```
-
+all<-innerjoin(aa,check, by="id_post")
 ```{r}
 vasy<-read.csv("~/sss/shauroom/vasy_shava.csv")
 geo$<-vasy$geo.coordinates
@@ -43,6 +44,9 @@ f<-as.data.frame(unlist(json))
   fa<-json$request
   l<- inner_join(l,geo, by = "id")
 ```
+```{r}
+all<-inner_join(aa,check, by="id_post")
+```
 
 ```{r}
 id="1_129207899_220df2876123d3542f"
@@ -52,5 +56,11 @@ url <- paste('https://api.vk.com/method/photos.getById?photos=', id, "&extended=
   #и вручную посмортите, есть ли инфа по координатам
   json$content
   json$request$fields
+```
+
+```{r}
+all<-innerjoin(aa,check, by="id_post")
+allnew <- all %>% filter((answer_text!="Не ел(а) там") & (answer_text !="Замечание в комментарии")
+                         & (answer_text !="Замечание в комментариях") & (answer_text !="Замечания в комментарии") & (answer_text !="Не ел(а) там"))
 ```
 
