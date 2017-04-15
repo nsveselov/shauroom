@@ -1,5 +1,5 @@
 ```{r оценки}
-check<-read.csv("~/sss/shauroom/dfcheck.csv")
+aa<-read.csv("~/sss/shauroom/aa.csv")
 o<-check
 
 o$оценка<-as.character(o$оценка)
@@ -34,13 +34,14 @@ vasy<-read.csv("~/sss/shauroom/vasy_shava.csv")
 geo$<-vasy$geo.coordinates
 geo$id<-vasy$id
 geo<-as.data.frame(geo)
-geo$cords<-vasy$geo.coordinates,
+geo$cords<-vasy$geo.coordinates
 geo$cords1<-vasy$geo
 json<-GET(as.character(vasy[715,28]))
 json<-GET("https://vk.com/wall-94119361_16144?z=photo-94119361_393180663%2Fwall-94119361_16144")
 f<-fromJSON(json)
 f<-as.data.frame(unlist(json))
   fa<-json$request
+  l<- inner_join(l,geo, by = "id")
 ```
 
 ```{r}
