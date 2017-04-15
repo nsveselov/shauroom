@@ -62,5 +62,20 @@ url <- paste('https://api.vk.com/method/photos.getById?photos=', id, "&extended=
 all<-innerjoin(aa,check, by="id_post")
 allnew <- all %>% filter((answer_text!="Не ел(а) там") & (answer_text !="Замечание в комментарии")
                          & (answer_text !="Замечание в комментариях") & (answer_text !="Замечания в комментарии") & (answer_text !="Не ел(а) там"))
+
+ex <-read.csv("~/shaverma/shauroom/ex.csv")
+exnew <- ex %>% filter((answer_text == unique(ex$answer_text)[1]) |
+                         (answer_text == unique(ex$answer_text)[2]) |
+                         (answer_text == unique(ex$answer_text)[5]) | 
+                         (answer_text == unique(ex$answer_text)[6]) |
+                         (answer_text == unique(ex$answer_text)[8]) |
+                         (answer_text == unique(ex$answer_text)[9]) |
+                         (answer_text == unique(ex$answer_text)[13]) |
+                         (answer_text == unique(ex$answer_text)[14]) |
+                         (answer_text == unique(ex$answer_text)[15]) |
+                         (answer_text == unique(ex$answer_text)[19]) |
+                         (answer_text == unique(ex$answer_text)[20]))
+write_csv(exnew, "ex.csv")
+
 ```
 
