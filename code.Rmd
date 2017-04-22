@@ -1,0 +1,81 @@
+```{r оценки}
+aa<-read.csv("~/sss/shauroom/aa.csv")
+o<-check
+
+o$оценка<-as.character(o$оценка)
+o$оценка<- casefold(o$оценка, upper=FALSE)
+o<-separate(o, col='оценка', into=c("оценка","two"), sep="',")
+remove<-c("оценка","'","/10","/1","'",":")
+o$оценка<-removeWords(o$оценка, remove)
+o$оценка<-gsub("[", "", o$оценка, fixed = T)
+o$оценка<-gsub("]", "", o$оценка, fixed = T)
+o$оценка<-gsub("'", "", o$оценка, fixed = T)
+o$оценка<-gsub(":", "", o$оценка, fixed = T)
+o$оценка<-gsub(" ", "", o$оценка, fixed = T)
+o$оценка<-gsub(",",".",o$оценка,fixed = T)
+o$оценка<-gsub("-","",o$оценка,fixed = T)
+o$оценка<-gsub("88","8",o$оценка,fixed = T)
+o$оценка<-gsub("78","7",o$оценка,fixed = T)
+o$оценка<-gsub("77","7",o$оценка,fixed = T)
+o$оценка<-gsub(".9","9",o$оценка,fixed = T)
+o$оценка<-gsub("—","",o$оценка,fixed = T)
+o$оценка<-as.numeric(o$оценка)
+check$оценка1<-o$оценка
+
+check$X<-NULL
+#одну оценку потерял, остальные вроде сходятся
+write.csv(check,"dfcheck.csv")
+#потерял оценку для id 16180
+write.csv(all, "ex.csv")
+all<-
+```
+all<-innerjoin(aa,check, by="id_post")
+```{r}
+vasy<-read.csv("~/sss/shauroom/vasy_shava.csv")
+geo$<-vasy$geo.coordinates
+geo$id<-vasy$id
+geo<-as.data.frame(geo)
+geo$cords<-vasy$geo.coordinates
+geo$cords1<-vasy$geo
+json<-GET(as.character(vasy[715,28]))
+json<-GET("https://vk.com/wall-94119361_16144?z=photo-94119361_393180663%2Fwall-94119361_16144")
+f<-fromJSON(json)
+f<-as.data.frame(unlist(json))
+  fa<-json$request
+  l<- inner_join(l,geo, by = "id")
+```
+```{r}
+all<-inner_join(aa,check, by="id_post")
+```
+
+```{r}
+id="1_129207899_220df2876123d3542f"
+id="-94119361_393180663" # фото у когорого надо достать геолокацию
+url <- paste('https://api.vk.com/method/photos.getById?photos=', id, "&extended=0", "&photo_sizes=0&v=5.62", "access_token=",my_token , sep = "")
+  json<-GET(url)
+  #и вручную посмортите, есть ли инфа по координатам
+  json$content
+  json$request$fields
+```
+
+```{r}
+all<-innerjoin(aa,check, by="id_post")
+allnew <- all %>% filter((answer_text!="Не ел(а) там") & (answer_text !="Замечание в комментарии")
+                         & (answer_text !="Замечание в комментариях") & (answer_text !="Замечания в комментарии") & (answer_text !="Не ел(а) там"))
+
+ex <-read.csv("~/shaverma/shauroom/ex.csv")
+exnew <- ex %>% filter((answer_text == unique(ex$answer_text)[1]) |
+                         (answer_text == unique(ex$answer_text)[2]) |
+                         (answer_text == unique(ex$answer_text)[5]) | 
+                         (answer_text == unique(ex$answer_text)[6]) |
+                         (answer_text == unique(ex$answer_text)[8]) |
+                         (answer_text == unique(ex$answer_text)[9]) |
+                         (answer_text == unique(ex$answer_text)[13]) |
+                         (answer_text == unique(ex$answer_text)[14]) |
+                         (answer_text == unique(ex$answer_text)[15]) |
+                         (answer_text == unique(ex$answer_text)[19]) |
+                         (answer_text == unique(ex$answer_text)[20]))
+write_csv(exnew, "ex.csv")
+
+```
+
