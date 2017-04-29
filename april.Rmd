@@ -1,6 +1,7 @@
 
 ```{r загрузка данных и их фильтрация}
 base<-read.csv("~/sss/shauroom/ex.csv") #Никите
+full <- read.csv("~/sss/shauroom/727_правильных_адресов.csv")
 unique(base$answer_text)
 base$answer_text<- casefold(base$answer_text, upper=FALSE)
 base$answer_text<-gsub(" ", "", base$answer_text, fixed = T) #чтобы не морочиться с пробелами
@@ -19,6 +20,41 @@ for (i in 1:nrow(base)){
 unique(base$answer_text)
 
 ```
+
+
+```{r штрафики}
+base$Оценка<-gsub(",", ".", base$Оценка, fixed = T)
+base$Оценка<-as.numeric(base$Оценка)
+base$corr=base$Оценка/2
+base1<-base
+
+
+
+##
+
+for (i in 1:nrow(base)){
+  if(base[i,8]=="шаверматамлучше"){base[i,14]=base[i,14]+1}
+  if(base[i,8]=="шаверматамхуже"){base[i,14]=base[i,14]-1}
+  if (base$corr[i] > 5){base$corr[i] <- 5}
+  if(base$corr[i]<0){base$corr[i]<-0}
+
+}
+
+?geom_histogram
+library(ggplot2)
+
+histogram(base$corr)
+
+ggplot(base, aes(x=corr)) + geom_histogram()
+# Change the width of bins
+ggplot(base, aes(x=corr)) + 
+  geom_histogram(binwidth=0.5)
+# Change colors
+ggplot(base, aes(x=corr)) + 
+  geom_histogram(color="pink", fill="grey")
+
+```
+
 
 ```{r}
 library(lattice)
@@ -42,6 +78,23 @@ tt <- base %>%
 tt$Оценка<-as.numeric(tt$Оценка)
 a<-histogram(tt$Оценка)
 print(a)
+```
+
+```{r для svd}
+ex<-read.csv("~/sss/shauroom/ex.csv")
+df <- as.data.frame(acast(ex, reviewer_id~id_post, value.var="score"))
+library(reshape2)
+
+c<-c(1,5,6,4,5,6,7,8,9)
+c<-as.data.frame(c)
+svd(c)
+d<-svd(c,nv = min(9,5))
+d.2<-d$d*d$u[2]
+
+```
+
+```{r пробую просто вычитать/плюсовать баллы}
+для ex
 
 ```
 
