@@ -1,23 +1,7 @@
 
 ```{r загрузка данных и их фильтрация}
-base<-read.csv("~/sss/shauroom/standart_base.csv") #Никите
-unique(base$answer_text)
-base$answer_text<- casefold(base$answer_text, upper=FALSE)
-base$answer_text<-gsub(" ", "", base$answer_text, fixed = T) #чтобы не морочиться с пробелами
-unique(base$answer_text)
-#в общем файле может быть еще какая чушь
-#наверняка можно проще, но всего один раз надо все это сделать и сохранить
-#или вообще оставить лучше/хуже/согласен(сна), называть как угодно, с пробелами и большими буквами
-for (i in 1:nrow(base)){
-  if(base[i,8]=="шварматамлучше"){base[i,8]<-"шаверматамлучше"}
-  if(base[i,8]=="шварматамхуже"){base[i,8]<-"шаверматамхуже"}
-  if(base[i,8]=="согласен(сна)савтором"){base[i,8]<-"согласен"}
-  if(base[i,8]=="согласен(на)савтором"){base[i,8]<-"согласен"}
-  if(base[i,8]=="согласен(сна)савторос"){base[i,8]<-"согласен"}
-  if(base[i,8]=="согалсен(сна)савтором"){base[i,8]<-"согласен"}
-  
-}
-unique(base$answer_text)
+full<-read.csv("~/sss/shauroom/standart_base.csv") #Никите
+full$X.1<-NULL
 
 ```
 
@@ -26,87 +10,35 @@ unique(base$answer_text)
 base<-full
 base$post_score<-gsub(",", ".", base$post_score, fixed = T)
 base$post_score<-as.numeric(base$post_score)
-base$corr=base$post_score/2
 base1<-base
 unique(base$answer_text)
 base<-base1
-#вставляем пропущенное значение
-for (i in 1:nrow(base)){
-  if(base[i,4]=="34476"){base[i,8]<-3.25}
-  if(base[i,4]=="34476"){base[i,7]<-6.5}
-  if(base[i,4]=="32747"){base[[i]]<-NULL}
-  if(i%%5000=="0"){print(i)}
-}
-##
 
+
+##
+base$fix=base$post_score/2
 for (i in 1:nrow(base)){
   if(base[i,3]=="Лучше"){base[i,8]=base[i,8]+1}
   if(base[i,3]=="Хуже"){base[i,8]=base[i,8]-1}
+  if(base[i,3]=="2"){base[i,8]<-2}
+  if(base[i,3]=="4"){base[i,8]<-4}
+  if(base[i,3]=="6"){base[i,8]<-6}
+  if(base[i,3]=="8"){base[i,8]<-8}
+  if(base[i,3]=="9,5"){base[i,8]<-9.5}
   if(i%%5000=="0"){print(i)}
 }
-base$corr<-as.numeric(base$corr)
+base[[8]]<-as.numeric(base[[8]])
 
 for (i in 1:nrow(base)){
-  if (base$corr[i] > 5){base$corr[i] <- 5}
-  if(base$corr[i] < 0){base$corr[i]<-0}
-  if(i%%100=="0"){print(i)}
+  if (base$fix[i] > 5){base$fix[i] <- 5}
+  if(base$fix[i] < 0){base$fix[i]<-0}
+  if(i%%10000=="0"){print(i)}
 }
 
-?geom_histogram
-library(ggplot2)
-
-histogram(base$corr)
-
-ggplot(base, aes(x=corr)) + geom_histogram()
-# Change the width of bins
-ggplot(base, aes(x=corr)) + 
-  geom_histogram(binwidth=0.5)
-# Change colors
-ggplot(base, aes(x=corr)) + 
-  geom_histogram(color="pink", fill="grey")
-
+write.csv(base,"~/sss/shauroom/fixed_score.csv")
 ```
-
 
 ```{r}
-library(lattice)
-b<-histogram(base$Оценка)
-print(a)
-paste(a)
-base1<-base
-base<-base1
-base$id_post<-as.numeric(base$id_post)
-base$Оценка<-gsub(",", ".", base$Оценка, fixed = T)
-base$Оценка<-as.numeric(base$Оценка)
-model <- lm(Оценка ~ id_post, data=base)
-dnorm(base[2,4])
-base$note<-predict(model, base$id_post)
-b<-qqmath(~base$Оценка)
-
-##
-tt <- base %>%
-  group_by(Оценка, id_post) %>%
-  dplyr::summarise(count=n())
-tt$Оценка<-as.numeric(tt$Оценка)
-a<-histogram(tt$Оценка)
-print(a)
-```
-
-```{r для svd}
-ex<-read.csv("~/sss/shauroom/ex.csv")
-df <- as.data.frame(acast(ex, reviewer_id~id_post, value.var="score"))
-library(reshape2)
-
-c<-c(1,5,6,4,5,6,7,8,9)
-c<-as.data.frame(c)
-svd(c)
-d<-svd(c,nv = min(9,5))
-d.2<-d$d*d$u[2]
-
-```
-
-```{r пробую просто вычитать/плюсовать баллы}
-для ex
 
 ```
 
