@@ -26,6 +26,7 @@ recc_predicted <- predict(object = recc_model, newdata = test_realm, n = 5)
 recc_matrix <- sapply(recc_predicted@items, function(x){
   colnames(test_realm)[x]
 })
+#один вариант
 a<-melt(recc_matrix)
 colnames(a)<- c("recc","reviewer_id")
 for(i in 1:(nrow(a)/5)){
@@ -35,11 +36,18 @@ a<-na.omit(a)
 a$recc<-NULL
 colnames(a)<- c("reviewer_id","recommended")
 
+#второй вариант
+all<-as.data.frame(NULL)
+for (i in 1:(nrow(a)/5)){
+  if(i%%5000=="0"){print(i)}
+  all[i, "reviewer_id"] = uniq[i,1]
+  all[i, "recommendation"] = paste(a$recc[((i-1)*5+1):((i-1)*5+5)],collapse = ",")
+}
+typeof(all$recommendation)
+unlist(all$recommendation[1])
+recc1<-unlist(all$recommendation[1])
 #в общем то всё
-
-
-
-
+#решил, что проще в лист записать, чем в 5 разных столбиков
 
 
 
