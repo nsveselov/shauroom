@@ -37,6 +37,7 @@ a$recc<-NULL
 colnames(a)<- c("reviewer_id","recommended")
 
 #второй вариант
+uniq<-as.data.frame(sort(unique(test$reviewer_id)))
 all<-as.data.frame(NULL)
 for (i in 1:(nrow(a)/5)){
   if(i%%5000=="0"){print(i)}
@@ -50,7 +51,33 @@ recc1<-unlist(all$recommendation[1])
 #решил, что проще в лист записать, чем в 5 разных столбиков
 
 
+#добавил рандомные значения, и посмотрел что рекомендует
+tetest<-test
+tetest[14630,2]=1337
+tetest[14630,4]=14238
+tetest[14630,8]=4
 
+tetest[14631,2]=1337
+tetest[14631,4]=20760
+tetest[14631,8]=4.25
+
+tetest[14632,2]=1337
+tetest[14632,4]=26611
+tetest[14632,8]=3
+
+tetest_df <- as.data.frame(acast(tetest, reviewer_id~id_post, value.var="fix"))
+tetest_matrix<-as.matrix(tetest_df)
+tetest_realm <- as(tetest_matrix, "realRatingMatrix")
+
+recc_predicted1 <- predict(object = recc_model, newdata = tetest_realm, n = 5)
+recc_matrix1 <- sapply(recc_predicted1@items, function(x){
+  colnames(tetest_realm)[x]
+})
+recc_matrix1$`1337`
+#Ответ:
+> recc_matrix1$`1337`
+[1] "10124" "11251" "11344" "12066" "13350"
+#чтото есть, уже неплохо
 
 #рекомендует не всем, и не совсем ясно как доставать данные
 dim(recc_matrix)
@@ -59,16 +86,10 @@ nrow(test_realm)
 uniq<-as.data.frame(sort(unique(test$reviewer_id)))
 df$V7<-df$V1
 
-for(i in 1:100){
-  df[i,1] <- uniq[i,1]
-  if(is.na(recc_predicted@items[[i]])=="FALSE FALSE FALSE FALSE FALSE FALSE"){
-df[i,2:7]<- recc_predicted@items[[i]]} else {df[i,2]<-"0"}
-}
-
 if(is.na(recc_predicted@items[[9]])=="FALSE"){
   df[9,2:7]<- recc_predicted@items[[9]]} else {df[9,1]<-0}
 
-df[7,2]<- (recc_predicted@items[[9]]
+df[7,2]<- (recc_predicted@items[[9]])
 
 
 #ИТОГ - табличка с 2 столбцами
@@ -82,6 +103,3 @@ for(i in 1:(nrow(a)/5)){
 a<-na.omit(a)
 
 
-
-```
-id<-filter(full, reviewer_id=="2545")
