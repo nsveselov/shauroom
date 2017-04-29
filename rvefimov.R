@@ -8,6 +8,8 @@ output: html_document
   ```{r Стандартизация answer_text, include=FALSE }
 df_727_right_addresses <- read.csv("~/shaverma/shauroom/727_правильных_адресов.csv")
 shaverma_df_light <- read.csv("~/shaverma/shauroom/shaverma_df_light.csv")
+df_727_right_addresses <- read.csv("~/sss/shauroom/727_правильных_адресов.csv") #Никите
+shaverma_df_light <- read.csv("~/sss/shauroom/shaverma_df_light.csv")
 
 test <- inner_join(shaverma_df_light, df_727_right_addresses, by = "id_post")
 test$address <- NULL
@@ -143,6 +145,19 @@ test_test[test_test$answer_text == unique(test_test$answer_text)[4], "answer_tex
 
 # ура! все ответы стандатизованы!
 
+# удаляем магазины без оценок 
+base <- test_test[-c(12984:13065,56277:56345), ]
+# вставляем пропущенные значения
+for (i in 1:nrow(base)){
+  if(base[i,4]=="34476"){base[i,7]<-6.5}
+  if(base[i,4]=="22209"){base[i,7]<-6.5}
+  if(base[i,4]=="20673"){base[i,7]<-7}
+  if(base[i,4]=="19279"){base[i,7]<-8}
+  if(base[i,4]=="16888"){base[i,7]<-9}
+  if(base[i,4]=="16409"){base[i,7]<-8}
+  if(i%%5000=="0"){print(i)}
+}
+write.csv(base,"~/sss/shauroom/standart_base.csv")
 ```
 
 
