@@ -1,7 +1,6 @@
 
 ```{r загрузка данных и их фильтрация}
-base<-read.csv("~/sss/shauroom/ex.csv") #Никите
-tt <- read.csv("~/sss/shauroom/727_правильных_адресов.csv")
+base<-read.csv("~/sss/shauroom/standart_base.csv") #Никите
 unique(base$answer_text)
 base$answer_text<- casefold(base$answer_text, upper=FALSE)
 base$answer_text<-gsub(" ", "", base$answer_text, fixed = T) #чтобы не морочиться с пробелами
@@ -16,6 +15,7 @@ for (i in 1:nrow(base)){
   if(base[i,8]=="согласен(на)савтором"){base[i,8]<-"согласен"}
   if(base[i,8]=="согласен(сна)савторос"){base[i,8]<-"согласен"}
   if(base[i,8]=="согалсен(сна)савтором"){base[i,8]<-"согласен"}
+  
 }
 unique(base$answer_text)
 
@@ -23,21 +23,33 @@ unique(base$answer_text)
 
 
 ```{r штрафики}
-base$Оценка<-gsub(",", ".", base$Оценка, fixed = T)
-base$Оценка<-as.numeric(base$Оценка)
-base$corr=base$Оценка/2
+base<-full
+base$post_score<-gsub(",", ".", base$post_score, fixed = T)
+base$post_score<-as.numeric(base$post_score)
+base$corr=base$post_score/2
 base1<-base
-
-
-
+unique(base$answer_text)
+base<-base1
+#вставляем пропущенное значение
+for (i in 1:nrow(base)){
+  if(base[i,4]=="34476"){base[i,8]<-3.25}
+  if(base[i,4]=="34476"){base[i,7]<-6.5}
+  if(base[i,4]=="32747"){base[[i]]<-NULL}
+  if(i%%5000=="0"){print(i)}
+}
 ##
 
 for (i in 1:nrow(base)){
-  if(base[i,8]=="шаверматамлучше"){base[i,14]=base[i,14]+1}
-  if(base[i,8]=="шаверматамхуже"){base[i,14]=base[i,14]-1}
-  if (base$corr[i] > 5){base$corr[i] <- 5}
-  if(base$corr[i]<0){base$corr[i]<-0}
+  if(base[i,3]=="Лучше"){base[i,8]=base[i,8]+1}
+  if(base[i,3]=="Хуже"){base[i,8]=base[i,8]-1}
+  if(i%%5000=="0"){print(i)}
+}
+base$corr<-as.numeric(base$corr)
 
+for (i in 1:nrow(base)){
+  if (base$corr[i] > 5){base$corr[i] <- 5}
+  if(base$corr[i] < 0){base$corr[i]<-0}
+  if(i%%100=="0"){print(i)}
 }
 
 ?geom_histogram
