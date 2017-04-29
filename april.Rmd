@@ -1,7 +1,7 @@
 
 ```{r загрузка данных и их фильтрация}
 base<-read.csv("~/sss/shauroom/ex.csv") #Никите
-full <- read.csv("~/sss/shauroom/727_правильных_адресов.csv")
+tt <- read.csv("~/sss/shauroom/727_правильных_адресов.csv")
 unique(base$answer_text)
 base$answer_text<- casefold(base$answer_text, upper=FALSE)
 base$answer_text<-gsub(" ", "", base$answer_text, fixed = T) #чтобы не морочиться с пробелами
