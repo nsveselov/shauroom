@@ -21,6 +21,27 @@ unique(base$answer_text)
 ```
 
 ```{r}
+library(lattice)
+b<-histogram(base$Оценка)
+print(a)
+paste(a)
+base1<-base
+base<-base1
+base$id_post<-as.numeric(base$id_post)
+base$Оценка<-gsub(",", ".", base$Оценка, fixed = T)
+base$Оценка<-as.numeric(base$Оценка)
+model <- lm(Оценка ~ id_post, data=base)
+dnorm(base[2,4])
+base$note<-predict(model, base$id_post)
+b<-qqmath(~base$Оценка)
+
+##
+tt <- base %>%
+  group_by(Оценка, id_post) %>%
+  dplyr::summarise(count=n())
+tt$Оценка<-as.numeric(tt$Оценка)
+a<-histogram(tt$Оценка)
+print(a)
 
 ```
 
