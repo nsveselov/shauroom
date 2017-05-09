@@ -229,13 +229,18 @@ for (i in score_dist$id_post){
 }
 
 plot(density(as.numeric(emp_dist)))
-N = 50
+
+N = length(as.numeric(emp_dist))
+
+library(plotrix)
 
 hist(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
            density(rescale(as.numeric(emp_dist),range(1,10)))$bw), freq = FALSE)
 lines(density(rescale(as.numeric(emp_dist),range(1,10))))
-hist(rescale(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
-                   density(rescale(as.numeric(emp_dist),range(1,10)))$bw), range(1,10)))
+resc_dist = rescale(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
+                   density(rescale(as.numeric(emp_dist),range(1,10)))$bw), range(1,10))
 
-approxfun(density(as.numeric(emp_dist)))
-uniroot(approxfun(density(as.numeric(emp_dist))), c(0,10))
+mean(resc_dist[resc_dist < post_score]) # восстановленная оценка
+
+# approxfun(density(as.numeric(emp_dist)))
+# uniroot(approxfun(density(as.numeric(emp_dist))), c(0,10))
