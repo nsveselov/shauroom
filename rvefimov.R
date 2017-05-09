@@ -5,11 +5,8 @@ date: "29 04 2017"
 output: html_document
 ---
   
-  ```{r Стандартизация answer_text, include=FALSE }
-df_727_right_addresses <- read.csv("~/shaverma/shauroom/727_правильных_адресов.csv")
+  df_727_right_addresses <- read.csv("~/shaverma/shauroom/727_правильных_адресов.csv")
 shaverma_df_light <- read.csv("~/shaverma/shauroom/shaverma_df_light.csv")
-df_727_right_addresses <- read.csv("~/sss/shauroom/727_правильных_адресов.csv") #Никите
-shaverma_df_light <- read.csv("~/sss/shauroom/shaverma_df_light.csv")
 
 test <- inner_join(shaverma_df_light, df_727_right_addresses, by = "id_post")
 test$address <- NULL
@@ -138,33 +135,18 @@ test_test[test_test$answer_text ==unique(test$answer_text)[118], "answer_text"]<
 test_test[test_test$answer_text ==unique(test$answer_text)[119], "answer_text"]<- "4"
 test_test[test_test$answer_text ==unique(test$answer_text)[120], "answer_text"]<- "6"
 test_test[test_test$answer_text ==unique(test$answer_text)[121], "answer_text"]<- "8"
-
-unique(test_test$answer_text)
-
 test_test[test_test$answer_text == unique(test_test$answer_text)[4], "answer_text"]<- unique(test_test$answer_text)[1]
 
+unique(test_test$answer_text)
 # ура! все ответы стандатизованы!
 
-# удаляем магазины без оценок 
-base <- test_test[-c(12984:13065,56277:56345), ]
-# вставляем пропущенные значения
-for (i in 1:nrow(base)){
-  if(base[i,4]=="34476"){base[i,7]<-6.5}
-  if(base[i,4]=="22209"){base[i,7]<-6.5}
-  if(base[i,4]=="20673"){base[i,7]<-7}
-  if(base[i,4]=="19279"){base[i,7]<-8}
-  if(base[i,4]=="16888"){base[i,7]<-9}
-  if(base[i,4]=="16409"){base[i,7]<-8}
-  if(i%%5000=="0"){print(i)}
-}
-write.csv(base,"~/sss/shauroom/standart_base.csv")
-```
 
 
 
 
 
-```{r Распределение оценок}
+## Распределение оценок
+
 score_dist <- test_test %>% group_by(id_post) %>% summarise(score = mean(post_score))
 
 score_dist <- na.omit(score_dist)
@@ -178,8 +160,82 @@ df_score_dist <- build_score_dist$data[[1]]
 #вероятность на отрезке
 integrate(approxfun(density(score_dist$score)), lower=0, upper=7)$value
 
-?distrEx
-library(distrEx)
-E(approxfun(density(score_dist$score)), lower=0, upper=7)
-```
+ggplot(data = score_dist, aes(x = score)) + geom_density()
+ggplot(data = score_dist[1:50,], aes(x = score)) + geom_density()
 
+### матожидание левой/правой ветвей распределения оценок
+post_score = 8
+mean(score_dist$score[score_dist$score < post_score])
+
+
+### сравнение распределений 
+
+ks.test(score_dist[1:50,]$score, score_dist$score, alternative = "two.sided")
+
+# все варианты сравнения: https://goo.gl/plV3av
+
+# Критерий Колмогорова-Смирнова проверяет гипотезу о том, 
+# что выборки извлечены из одной и той же популяции, 
+# против альтернативной гипотезы, когда выборки извлечены из разных популяций. 
+# Иными словами, проверяется гипотеза однородности двух выборок. 
+# https://goo.gl/nLe12o -- описание механики работы
+
+
+
+id_post = 10817
+
+post_score = round(mean(test_test$post_score[test_test$id_post == id_post]), 0)
+emp_dist = test_test$answer_text[test_test$id_post == id_post]
+emp_dist[emp_dist == "Лучше"] <- 1
+emp_dist[emp_dist == "Хуже"] <- -1
+emp_dist[emp_dist == "Согласен"] <- 0
+
+popul_dist = as.numeric(round(score_dist$score, 0))
+popul_dist[popul_dist >= post_score+1] <- "Лучше"
+popul_dist[popul_dist <= post_score-1] <- "Хуже"
+popul_dist[popul_dist == post_score] <- "Согласен"
+popul_dist[popul_dist == "Лучше"] <- 1
+popul_dist[popul_dist == "Хуже"] <- -1
+popul_dist[popul_dist == "Согласен"] <- 0
+
+ks.test(as.numeric(emp_dist), as.numeric(popul_dist), alternative = "two.sided")$p.value
+
+# emp_data = red
+# popul_data = blue
+ggplot(data = as.data.frame(as.numeric(emp_dist)), aes(x = as.numeric(emp_dist), color = 'red')) + 
+  geom_density() +
+  geom_density(data = as.data.frame(as.numeric(popul_dist)), aes(x = as.numeric(popul_dist), color = 'blue')) + 
+  scale_x_continuous(breaks=seq((-1),1,1),lim=c((-1),1))
+
+
+for (i in score_dist$id_post){
+  id_post = i
+  
+  post_score = round(mean(test_test$post_score[test_test$id_post == id_post]), 0)
+  emp_dist = test_test$answer_text[test_test$id_post == id_post]
+  emp_dist[emp_dist == "Лучше"] <- 1
+  emp_dist[emp_dist == "Хуже"] <- -1
+  emp_dist[emp_dist == "Согласен"] <- 0
+  
+  popul_dist = as.numeric(round(score_dist$score, 0))
+  popul_dist[popul_dist >= post_score+1] <- "Лучше"
+  popul_dist[popul_dist <= post_score-1] <- "Хуже"
+  popul_dist[popul_dist == post_score] <- "Согласен"
+  popul_dist[popul_dist == "Лучше"] <- 1
+  popul_dist[popul_dist == "Хуже"] <- -1
+  popul_dist[popul_dist == "Согласен"] <- 0
+  
+  score_dist[score_dist$id_post == i, "p_value"] <- round(ks.test(as.numeric(emp_dist), as.numeric(popul_dist), alternative = "two.sided")$p.value, 2)
+}
+
+plot(density(as.numeric(emp_dist)))
+N = 50
+
+hist(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
+           density(rescale(as.numeric(emp_dist),range(1,10)))$bw), freq = FALSE)
+lines(density(rescale(as.numeric(emp_dist),range(1,10))))
+hist(rescale(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
+                   density(rescale(as.numeric(emp_dist),range(1,10)))$bw), range(1,10)))
+
+approxfun(density(as.numeric(emp_dist)))
+uniroot(approxfun(density(as.numeric(emp_dist))), c(0,10))
