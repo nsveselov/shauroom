@@ -4,9 +4,14 @@ author: "Ruslan Efimov"
 date: "29 04 2017"
 output: html_document
 ---
-  
-  df_727_right_addresses <- read.csv("~/shaverma/shauroom/727_правильных_адресов.csv")
-shaverma_df_light <- read.csv("~/shaverma/shauroom/shaverma_df_light.csv")
+
+library(dplyr)  
+library(scales)
+
+#### очистка и подготовка данных -- преокончательный вариант ####
+
+df_727_right_addresses <- read.csv("~/shauroom/727_правильных_адресов.csv")
+shaverma_df_light <- read.csv("~/shauroom/shaverma_df_light.csv")
 
 test <- inner_join(shaverma_df_light, df_727_right_addresses, by = "id_post")
 test$address <- NULL
@@ -142,13 +147,9 @@ unique(test_test$answer_text)
 
 
 
-
-
-
-## Распределение оценок
+#### получение распределения оценок ####
 
 score_dist <- test_test %>% group_by(id_post) %>% summarise(score = mean(post_score))
-
 score_dist <- na.omit(score_dist)
 
 # график плотности
@@ -157,18 +158,19 @@ gg_score_dist <- ggplot(data = score_dist, aes(x = score)) + geom_density()
 build_score_dist <- ggplot_build(gg_score_dist)
 df_score_dist <- build_score_dist$data[[1]]
 
-#вероятность на отрезке
+# вероятность на отрезке
 integrate(approxfun(density(score_dist$score)), lower=0, upper=7)$value
 
 ggplot(data = score_dist, aes(x = score)) + geom_density()
 ggplot(data = score_dist[1:50,], aes(x = score)) + geom_density()
 
-### матожидание левой/правой ветвей распределения оценок
+# матожидание левой/правой ветвей распределения оценок
 post_score = 8
 mean(score_dist$score[score_dist$score < post_score])
 
 
-### сравнение распределений 
+
+#### сравнение распределений ####
 
 ks.test(score_dist[1:50,]$score, score_dist$score, alternative = "two.sided")
 
@@ -179,8 +181,6 @@ ks.test(score_dist[1:50,]$score, score_dist$score, alternative = "two.sided")
 # против альтернативной гипотезы, когда выборки извлечены из разных популяций. 
 # Иными словами, проверяется гипотеза однородности двух выборок. 
 # https://goo.gl/nLe12o -- описание механики работы
-
-
 
 id_post = 10817
 
@@ -232,11 +232,9 @@ plot(density(as.numeric(emp_dist)))
 
 N = length(as.numeric(emp_dist))
 
-library(plotrix)
-
-# hist(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE),
-#            density(rescale(as.numeric(emp_dist),range(1,10)))$bw), freq = FALSE)
-# lines(density(rescale(as.numeric(emp_dist),range(1,10))))
+hist(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE),
+            density(rescale(as.numeric(emp_dist),range(1,10)))$bw), freq = FALSE)
+lines(density(rescale(as.numeric(emp_dist),range(1,10))))
 resc_dist = rescale(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
                    density(rescale(as.numeric(emp_dist),range(1,10)))$bw), range(1,10))
 mean(resc_dist[resc_dist < post_score]) # восстановленная оценка
@@ -244,32 +242,35 @@ mean(resc_dist[resc_dist < post_score]) # восстановленная оце�
 # approxfun(density(as.numeric(emp_dist)))
 # uniroot(approxfun(density(as.numeric(emp_dist))), c(0,10))
 
-x = 1
 
+
+
+#### восстановление оценок -- вариант 1 ####
+
+#1 test_test_copy <- test_test
+#2 test_test <- test_test_copy
+
+test_test$final_grade <- test_test$answer_text
+
+x = 0
 for (i in unique(test_test$id_post)){
+  #print(i)
   print(x/length(unique(test_test$id_post)))
   x = x + 1
   
   # сформировали эмпирическое распределение оценок и кодировали
-  post_score = round(mean(test_test$post_score[test_test$id_post == id_post]), 0)
-  emp_dist = test_test$answer_text[test_test$id_post == id_post]
+  post_score = round(mean(test_test$post_score[test_test$id_post == i]), 1)
+  emp_dist = test_test$answer_text[test_test$id_post == i]
   emp_dist[emp_dist == "Лучше"] <- 1
   emp_dist[emp_dist == "Хуже"] <- -1
   emp_dist[emp_dist == "Согласен"] <- 0
-  resc_dist = rescale(rnorm(N, sample(rescale(as.numeric(emp_dist),range(1,10)), size = N, replace = TRUE), 
-                            density(rescale(as.numeric(emp_dist),range(1,10)))$bw), range(1,10))
+  resc_dist = rescale(rnorm(length(as.numeric(emp_dist)), sample(rescale(as.numeric(emp_dist),range(1,10)), size = length(as.numeric(emp_dist)), replace = TRUE), 
+                            density(rescale(as.numeric(emp_dist),range(0,10)))$bw), range(0,10))
   
-  for (o in rownames(test_test[test_test$id_post == i, ])){
-    answer = test_test[o, "answer_text"]
-    if (answer == "Согласен"){
-      test_test[o, "final_grade"] = post_score}
-    if (answer == "Хуже"){
-      test_test[o, "final_grade"] = mean(resc_dist[resc_dist < post_score])}
-    if (answer == "Лучше"){
-      test_test[o, "final_grade"] = mean(resc_dist[resc_dist > post_score])}
-    else {
-      test_test[o, "final_grade"] = as.numeric(test_test[o, "answer_text"])
-    }
-  }
-}  
-  
+  test_test[(test_test$id_post == i) & (test_test$answer == "Согласен"), ]$final_grade <- round(post_score, 1)
+  try(test_test[(test_test$id_post == i) & (test_test$answer == "Хуже"), ]$final_grade <- round(mean(resc_dist[resc_dist < post_score]), 1), silent = T)
+  try(test_test[(test_test$id_post == i) & (test_test$answer == "Лучше"), ]$final_grade <- round(mean(resc_dist[resc_dist > post_score]), 1), silent = T)
+} 
+
+
+
