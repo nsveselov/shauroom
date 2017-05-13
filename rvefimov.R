@@ -273,4 +273,13 @@ for (i in unique(test_test$id_post)){
 } 
 
 
+#### убрали чуваков с 1-им и 2-мя отзывами ####
+
+number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
+number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 3)
+
+clean_data_v2 <- inner_join(number, clean_data_v1, by = "reviewer_id")
+clean_data_v2$n <- NULL
+
+
 
