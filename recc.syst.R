@@ -37,6 +37,10 @@ a$recc<-NULL
 colnames(a)<- c("reviewer_id","recommended")
 
 #второй вариант
+library(tidyr)
+recc<-separate(a, col='recommended', into=c("one","two","three","four","five"), sep=",")
+#на выходе табличка с шестью колонками
+
 uniq<-as.data.frame(sort(unique(test$reviewer_id)))
 all<-as.data.frame(NULL)
 for (i in 1:(nrow(a)/5)){
