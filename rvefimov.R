@@ -13,7 +13,7 @@ library(scales)
 df_723_right_addresses <- read.csv("~/shauroom/723_correct_address.csv")
 shaverma_df_light <- read.csv("~/shauroom/shaverma_df_light.csv")
 
-test <- inner_join(shaverma_df_light, df_724_right_addresses, by = "id_post")
+test <- inner_join(shaverma_df_light, df_723_right_addresses, by = "id_post")
 test$address <- NULL
 test$score_test <- NULL
 test$answer_id <- NULL
@@ -281,14 +281,23 @@ test_test[(test_test$post_score == 10.0) & (test_test$final_grade == NaN), ]$fin
 
 #### убрали чуваков с 1-им и 2-мя отзывами ####
 
-#number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
+# удаление повторяющихся reviewer_id
+number_check <- test_test %>% group_by(reviewer_id,id_post) %>% summarise(n = n())
+test_test[(test_test$reviewer_id == 89195353) & (test_test$id_post == 33951), ]
+test_test <- test_test[-10381,]
+# test_test <- test_test[-10428,]
+
+# number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
 number <- test_test %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 3)
 
-clean_data <- inner_join(number, test_test, by = "reviewer_id")
-clean_data$n <- NULL
+clean_df_for_recommend <- inner_join(number, test_test, by = "reviewer_id")
+clean_df_for_recommend$n <- NULL
+clean_df_for_recommend$name <- NULL
+clean_df_for_recommend$X <- NULL
 
-clean_data$final_grade <- as.numeric(clean_data$final_grade)
-write.csv(clean_data, 'clean_data_v1.csv')
+clean_df_for_recommend$final_grade <- as.numeric(clean_df_for_recommend$final_grade)
+write.csv(clean_df_for_recommend, 'clean_data_v1.csv')
+
 
 # #### почистил от записей с повторениями reviewer_id и id_post
 # #### апдейдтнул файл, эта часть не требуется
