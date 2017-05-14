@@ -10,10 +10,10 @@ library(scales)
 
 #### очистка и подготовка данных -- преокончательный вариант ####
 
-df_727_right_addresses <- read.csv("~/shauroom/727_правильных_адресов.csv")
+df_724_right_addresses <- read.csv("~/shauroom/724_correct_address_(modified 12-05 rvefimov).csv")
 shaverma_df_light <- read.csv("~/shauroom/shaverma_df_light.csv")
 
-test <- inner_join(shaverma_df_light, df_727_right_addresses, by = "id_post")
+test <- inner_join(shaverma_df_light, df_724_right_addresses, by = "id_post")
 test$address <- NULL
 test$score_test <- NULL
 test$answer_id <- NULL
@@ -253,7 +253,8 @@ mean(resc_dist[resc_dist < post_score]) # восстановленная оце�
 test_test$final_grade <- test_test$answer_text
 
 x = 0
-for (i in unique(test_test$id_post)){
+### без 9119 -> его сделать руками !!!
+for (i in unique(test_test$id_post)[1:(length(unique(test_test$id_post))-1)]){
   #print(i)
   print(x/length(unique(test_test$id_post)))
   x = x + 1
@@ -267,19 +268,24 @@ for (i in unique(test_test$id_post)){
   resc_dist = rescale(rnorm(length(as.numeric(emp_dist)), sample(rescale(as.numeric(emp_dist),range(1,10)), size = length(as.numeric(emp_dist)), replace = TRUE), 
                             density(rescale(as.numeric(emp_dist),range(0,10)))$bw), range(0,10))
   
-  test_test[(test_test$id_post == i) & (test_test$answer == "Согласен"), ]$final_grade <- round(post_score, 1)
+  try(test_test[(test_test$id_post == i) & (test_test$answer == "Согласен"), ]$final_grade <- round(post_score, 1), silent = T)
   try(test_test[(test_test$id_post == i) & (test_test$answer == "Хуже"), ]$final_grade <- round(mean(resc_dist[resc_dist < post_score]), 1), silent = T)
   try(test_test[(test_test$id_post == i) & (test_test$answer == "Лучше"), ]$final_grade <- round(mean(resc_dist[resc_dist > post_score]), 1), silent = T)
 } 
 
+test_test[(test_test$id_post == 9119) & (test_test$answer == "Согласен"), ]$final_grade <- 8
+test_test[(test_test$id_post == 9119) & (test_test$answer == "9,5"), ]$final_grade <- 9.5
+test_test[(test_test$post_score == 0.0) & (test_test$final_grade == NaN), ]$final_grade <- 0
+test_test[(test_test$post_score == 10.0) & (test_test$final_grade == NaN), ]$final_grade <- 10
+test_test[(test_test$final_grade == 10), ]$final_grade
 
 #### убрали чуваков с 1-им и 2-мя отзывами ####
 
 number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
-number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 3)
+number <- test_test %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 3)
 
-clean_data_v2 <- inner_join(number, clean_data_v1, by = "reviewer_id")
-clean_data_v2$n <- NULL
+clean_data <- inner_join(number, test_test, by = "reviewer_id")
+clean_data$n <- NULL
 
-
-
+clean_data$final_grade <- as.numeric(clean_data$final_grade)
+write.csv(clean_data, 'clean_data.csv')
