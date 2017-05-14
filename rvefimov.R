@@ -289,3 +289,15 @@ clean_data$n <- NULL
 
 clean_data$final_grade <- as.numeric(clean_data$final_grade)
 write.csv(clean_data, 'clean_data.csv')
+
+### почистил от записей с повторениями reviewer_id и id_post
+full<-read.csv("~/sss/shauroom/clean_data.csv")
+number <- full %>% group_by(reviewer_id,id_post) %>% summarise(n = n())
+#крашится матрица изза этого
+for(i in 1:nrow(full)){
+  if(i%%2000==0){print(i)}
+  if(full[i,5]=="17012" & full[i,7]=="Садовая, 42"){full<-full[-i,]}
+}
+full<-full[-23532,]
+full$X.1<-NULL
+write.csv(full, "clean_data_v1.csv")
