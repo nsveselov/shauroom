@@ -11,7 +11,7 @@ df_realm <- as(df_matrix, "realRatingMatrix")
 
 #запись модели (не знаю, что означают параметры в функции)
 #считает минуты 4
-recc_model <- Recommender(data = main_realm, method = "IBCF", parameter = list(k = 30))
+recc_model <- Recommender(data = df_realm, method = "IBCF", parameter = list(k = 30))
 
 #создание матрицы рекомендаций для полльзователей
 recc_predicted <- predict(object = recc_model, newdata = df_realm, n = 5)
