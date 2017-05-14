@@ -10,10 +10,10 @@ library(scales)
 
 #### очистка и подготовка данных -- преокончательный вариант ####
 
-df_724_right_addresses <- read.csv("~/shauroom/724_correct_address_(modified 12-05 rvefimov).csv")
+df_723_right_addresses <- read.csv("~/shauroom/723_correct_address.csv")
 shaverma_df_light <- read.csv("~/shauroom/shaverma_df_light.csv")
 
-test <- inner_join(shaverma_df_light, df_724_right_addresses, by = "id_post")
+test <- inner_join(shaverma_df_light, df_723_right_addresses, by = "id_post")
 test$address <- NULL
 test$score_test <- NULL
 test$answer_id <- NULL
@@ -27,57 +27,57 @@ test_test <- test %>% filter((answer_text == unique(test$answer_text)[1]) |
                                (answer_text == unique(test$answer_text)[8]) |
                                (answer_text == unique(test$answer_text)[9]) |
                                (answer_text == unique(test$answer_text)[10]) |
+                               (answer_text == unique(test$answer_text)[16]) |
+                               (answer_text == unique(test$answer_text)[18]) |
                                (answer_text == unique(test$answer_text)[19]) |
                                (answer_text == unique(test$answer_text)[21]) |
-                               (answer_text == unique(test$answer_text)[22]) |
-                               (answer_text == unique(test$answer_text)[24]) |
+                               (answer_text == unique(test$answer_text)[23]) |
+                               (answer_text == unique(test$answer_text)[25]) |
                                (answer_text == unique(test$answer_text)[26]) |
-                               (answer_text == unique(test$answer_text)[28]) |
-                               (answer_text == unique(test$answer_text)[29]) |
-                               (answer_text == unique(test$answer_text)[33]) |
-                               (answer_text == unique(test$answer_text)[34]) |
-                               (answer_text == unique(test$answer_text)[35]) |
-                               (answer_text == unique(test$answer_text)[40]) |
+                               (answer_text == unique(test$answer_text)[30]) |
+                               (answer_text == unique(test$answer_text)[31]) |
+                               (answer_text == unique(test$answer_text)[32]) |
+                               (answer_text == unique(test$answer_text)[37]) |
+                               (answer_text == unique(test$answer_text)[38]) |
+                               (answer_text == unique(test$answer_text)[39]) |
                                (answer_text == unique(test$answer_text)[41]) |
-                               (answer_text == unique(test$answer_text)[42]) |
+                               (answer_text == unique(test$answer_text)[43]) |
                                (answer_text == unique(test$answer_text)[44]) |
-                               (answer_text == unique(test$answer_text)[46]) |
-                               (answer_text == unique(test$answer_text)[47]) |
+                               (answer_text == unique(test$answer_text)[45]) |
                                (answer_text == unique(test$answer_text)[48]) |
+                               (answer_text == unique(test$answer_text)[49]) |
+                               (answer_text == unique(test$answer_text)[50]) |
                                (answer_text == unique(test$answer_text)[51]) |
                                (answer_text == unique(test$answer_text)[52]) |
                                (answer_text == unique(test$answer_text)[53]) |
                                (answer_text == unique(test$answer_text)[54]) |
-                               (answer_text == unique(test$answer_text)[55]) |
-                               (answer_text == unique(test$answer_text)[56]) |
                                (answer_text == unique(test$answer_text)[57]) |
-                               (answer_text == unique(test$answer_text)[60]) |
+                               (answer_text == unique(test$answer_text)[59]) |
                                (answer_text == unique(test$answer_text)[62]) |
+                               (answer_text == unique(test$answer_text)[64]) |
                                (answer_text == unique(test$answer_text)[65]) |
-                               (answer_text == unique(test$answer_text)[67]) |
+                               (answer_text == unique(test$answer_text)[66]) |
                                (answer_text == unique(test$answer_text)[68]) |
-                               (answer_text == unique(test$answer_text)[69]) |
-                               (answer_text == unique(test$answer_text)[71]) |
-                               (answer_text == unique(test$answer_text)[75]) |
-                               (answer_text == unique(test$answer_text)[77]) |
-                               (answer_text == unique(test$answer_text)[81]) |
-                               (answer_text == unique(test$answer_text)[82]) |
+                               (answer_text == unique(test$answer_text)[72]) |
+                               (answer_text == unique(test$answer_text)[74]) |
+                               (answer_text == unique(test$answer_text)[78]) |
+                               (answer_text == unique(test$answer_text)[79]) |
+                               (answer_text == unique(test$answer_text)[87]) |
+                               (answer_text == unique(test$answer_text)[89]) |
                                (answer_text == unique(test$answer_text)[90]) |
-                               (answer_text == unique(test$answer_text)[92]) |
                                (answer_text == unique(test$answer_text)[93]) |
-                               (answer_text == unique(test$answer_text)[96]) |
-                               (answer_text == unique(test$answer_text)[97]) |
-                               (answer_text == unique(test$answer_text)[98]) |
+                               (answer_text == unique(test$answer_text)[94]) |
+                               (answer_text == unique(test$answer_text)[95]) |
+                               (answer_text == unique(test$answer_text)[100]) |
                                (answer_text == unique(test$answer_text)[103]) |
+                               (answer_text == unique(test$answer_text)[104]) |
                                (answer_text == unique(test$answer_text)[106]) |
-                               (answer_text == unique(test$answer_text)[107]) |
-                               (answer_text == unique(test$answer_text)[109]) |
+                               (answer_text == unique(test$answer_text)[110]) |
                                (answer_text == unique(test$answer_text)[113]) |
+                               (answer_text == unique(test$answer_text)[115]) |
                                (answer_text == unique(test$answer_text)[116]) |
-                               (answer_text == unique(test$answer_text)[118]) |
-                               (answer_text == unique(test$answer_text)[119]) |
-                               (answer_text == unique(test$answer_text)[120]) |
-                               (answer_text == unique(test$answer_text)[121]))
+                               (answer_text == unique(test$answer_text)[117]) |
+                               (answer_text == unique(test$answer_text)[118]))
 
 unique(test_test$answer_text)
 
@@ -89,57 +89,57 @@ test_test[test_test$answer_text ==unique(test$answer_text)[3], "answer_text"]<- 
 test_test[test_test$answer_text ==unique(test$answer_text)[8], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[9], "answer_text"]<- "Лучше"
 test_test[test_test$answer_text ==unique(test$answer_text)[10], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[19], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[21], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[22], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[24], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[16], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[18], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[19], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[21], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[23], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[25], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[26], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[28], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[29], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[33], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[34], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[35], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[40], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[41], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[42], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[44], "answer_text"]<- "Cогласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[46], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[47], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[30], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[31], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[32], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[37], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[38], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[39], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[41], "answer_text"]<- "Cогласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[43], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[44], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[45], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[48], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[51], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[52], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[53], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[54], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[55], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[56], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[57], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[60], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[49], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[50], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[51], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[52], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[53], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[54], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[57], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[59], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[62], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[64], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[65], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[67], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[68], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[69], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[71], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[75], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[77], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[81], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[82], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[90], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[92], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[66], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[68], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[72], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[74], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[78], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[79], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[87], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[89], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[90], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[93], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[96], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[97], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[98], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[94], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[95], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[100], "answer_text"]<- "Согласен"
 test_test[test_test$answer_text ==unique(test$answer_text)[103], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[106], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[107], "answer_text"]<- "Хуже"
-test_test[test_test$answer_text ==unique(test$answer_text)[109], "answer_text"]<- "Лучше"
-test_test[test_test$answer_text ==unique(test$answer_text)[113], "answer_text"]<- "Согласен"
-test_test[test_test$answer_text ==unique(test$answer_text)[116], "answer_text"]<- "9,5"
-test_test[test_test$answer_text ==unique(test$answer_text)[118], "answer_text"]<- "2"
-test_test[test_test$answer_text ==unique(test$answer_text)[119], "answer_text"]<- "4"
-test_test[test_test$answer_text ==unique(test$answer_text)[120], "answer_text"]<- "6"
-test_test[test_test$answer_text ==unique(test$answer_text)[121], "answer_text"]<- "8"
+test_test[test_test$answer_text ==unique(test$answer_text)[104], "answer_text"]<- "Хуже"
+test_test[test_test$answer_text ==unique(test$answer_text)[106], "answer_text"]<- "Лучше"
+test_test[test_test$answer_text ==unique(test$answer_text)[110], "answer_text"]<- "Согласен"
+test_test[test_test$answer_text ==unique(test$answer_text)[113], "answer_text"]<- "9.5"
+test_test[test_test$answer_text ==unique(test$answer_text)[115], "answer_text"]<- "2"
+test_test[test_test$answer_text ==unique(test$answer_text)[116], "answer_text"]<- "4"
+test_test[test_test$answer_text ==unique(test$answer_text)[117], "answer_text"]<- "6"
+test_test[test_test$answer_text ==unique(test$answer_text)[118], "answer_text"]<- "8"
 test_test[test_test$answer_text == unique(test_test$answer_text)[4], "answer_text"]<- unique(test_test$answer_text)[1]
 
 unique(test_test$answer_text)
@@ -273,31 +273,42 @@ for (i in unique(test_test$id_post)[1:(length(unique(test_test$id_post))-1)]){
   try(test_test[(test_test$id_post == i) & (test_test$answer == "Лучше"), ]$final_grade <- round(mean(resc_dist[resc_dist > post_score]), 1), silent = T)
 } 
 
-test_test[(test_test$id_post == 9119) & (test_test$answer == "Согласен"), ]$final_grade <- 8
-test_test[(test_test$id_post == 9119) & (test_test$answer == "9,5"), ]$final_grade <- 9.5
+#test_test[(test_test$id_post == 9119) & (test_test$answer == "Согласен"), ]$final_grade <- 8
+#test_test[(test_test$id_post == 9119) & (test_test$answer == "9,5"), ]$final_grade <- 9.5
 test_test[(test_test$post_score == 0.0) & (test_test$final_grade == NaN), ]$final_grade <- 0
 test_test[(test_test$post_score == 10.0) & (test_test$final_grade == NaN), ]$final_grade <- 10
-test_test[(test_test$final_grade == 10), ]$final_grade
+#test_test[(test_test$final_grade == 10), ]$final_grade
 
 #### убрали чуваков с 1-им и 2-мя отзывами ####
 
-number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
+# удаление повторяющихся reviewer_id
+number_check <- test_test %>% group_by(reviewer_id,id_post) %>% summarise(n = n())
+test_test[(test_test$reviewer_id == 89195353) & (test_test$id_post == 33951), ]
+test_test <- test_test[-10381,]
+# test_test <- test_test[-10428,]
+
+# number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
 number <- test_test %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 3)
 
-clean_data <- inner_join(number, test_test, by = "reviewer_id")
-clean_data$n <- NULL
+clean_df_for_recommend <- inner_join(number, test_test, by = "reviewer_id")
+clean_df_for_recommend$n <- NULL
+clean_df_for_recommend$name <- NULL
+clean_df_for_recommend$X <- NULL
 
-clean_data$final_grade <- as.numeric(clean_data$final_grade)
-write.csv(clean_data, 'clean_data.csv')
+clean_df_for_recommend$final_grade <- as.numeric(clean_df_for_recommend$final_grade)
+write.csv(clean_df_for_recommend, 'clean_data_v1.csv')
 
-### почистил от записей с повторениями reviewer_id и id_post
-full<-read.csv("~/sss/shauroom/clean_data.csv")
-number <- full %>% group_by(reviewer_id,id_post) %>% summarise(n = n())
-#крашится матрица изза этого
-for(i in 1:nrow(full)){
-  if(i%%2000==0){print(i)}
-  if(full[i,5]=="17012" & full[i,7]=="Садовая, 42"){full<-full[-i,]}
-}
-full<-full[-23532,]
-full$X.1<-NULL
-write.csv(full, "clean_data_v1.csv")
+
+# #### почистил от записей с повторениями reviewer_id и id_post
+# #### апдейдтнул файл, эта часть не требуется
+# full<-read.csv("~/sss/shauroom/clean_data.csv")
+# number <- full %>% group_by(reviewer_id,id_post) %>% summarise(n = n())
+# #крашится матрица изза этого
+# for(i in 1:nrow(full)){
+#   if(i%%2000==0){print(i)}
+#   if(full[i,5]=="17012" & full[i,7]=="Садовая, 42"){full<-full[-i,]}
+# }
+# full<-full[-23532,]
+# full$X.1<-NULL
+# write.csv(full, "clean_data_v1.csv")
+
