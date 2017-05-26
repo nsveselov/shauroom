@@ -1,5 +1,5 @@
 #Загрузка
-full<-read.csv("~/sss/shauroom/clean_data_v1.csv")
+full<-read.csv("~/shauroom/clean_data_v1.csv")
 full$X.1<- NULL
 #MAKE MATRIX
 library(reshape2)
@@ -16,7 +16,7 @@ recc_model <- Recommender(data = df_realm, method = "IBCF", parameter = list(k =
 #создание матрицы рекомендаций для полльзователей
 recc_predicted <- predict(object = recc_model, newdata = df_realm, n = 5)
 recc_matrix <- sapply(recc_predicted@items, function(x){
-  colnames(test_realm)[x]
+  colnames(df_realm)[x]
 })
 #один вариант
 a<-melt(recc_matrix)
