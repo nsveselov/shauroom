@@ -5,7 +5,6 @@ library(reshape2)
 load("~/shauroom/shriny/environment.RData")
 
 shaverma_recommendation <- function(select,select1,select2,grade,grade1,grade2) {
-  print("Making recommendation ...")
   full<-read.csv("~/shauroom/clean_data_v1.csv")
   full_2<-full
   full_2[45275, "final_grade"] <- grade
@@ -28,7 +27,7 @@ shaverma_recommendation <- function(select,select1,select2,grade,grade1,grade2) 
   recc_matrix1 <- sapply(recc_predicted1@items, function(x){
     colnames(tetest_realm)[x]
   })
-  return(recc_matrix1$`1337`)
+  print(recc_matrix1$`1337`)
 
 }
 
