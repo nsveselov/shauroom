@@ -1,6 +1,7 @@
 library(shiny)
 library(reshape2)
 library(recommenderlab)
+load("~/shauroom/local_shiny/for_local.RData")
 #описание функции shaverma_recommendation в shriny/helpercode
 ui <- fluidPage("Shauroom",
                 selectInput("select", label = h3("Выберите шаверменную"), 
