@@ -3,7 +3,6 @@ library(reshape2)
 library(recommenderlab)
 #описание функции shaverma_recommendation в shriny/helpercode
 ui <- fluidPage("Shauroom",
-                load("~/shauroom/local_shiny/names.RData"),
                 selectInput("select", label = h3("Выберите шаверменную"), 
                             choices = namesAdrr, 
                             selected = 1),
@@ -38,7 +37,7 @@ server <- function (input,output) {
   
   output$result <- renderTable({ 
     
-    load("~/shauroom/local_shiny/envir_and_func.RData")
+    load("~/shauroom/local_shiny/for_local.RData")
     
     print(shaverma_recommendation(input$select,input$select2,input$select3, input$num,input$num2,input$num3))
     
