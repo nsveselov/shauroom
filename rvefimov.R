@@ -296,7 +296,6 @@ clean_df_for_recommend$address.x <- NULL
 clean_df_for_recommend$X <- NULL
 clean_df_for_recommend$Do <- NULL
 clean_df_for_recommend$coordinate <- NULL
-clean_df_for_recommend$ <- NULL
 
 
 clean_df_for_recommend$final_grade <- as.numeric(clean_df_for_recommend$final_grade)
@@ -346,10 +345,4 @@ for (i in 643:nrow(adres)){
   }
 }
 write.csv(adres, "adres.csv")
-
-
-################# добавляем в таблицу координаты, районы, корректные адреса ###############
-subset(df_723_right_addresses, select = c("id_post", "idshava", "name", "coord1", "coord2", "photo", )
-
-clean_data_v2 <- inner_join(clean_data_v1, df_723_right_addresses, by = "id_post")
 
