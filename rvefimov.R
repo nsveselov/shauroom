@@ -352,18 +352,18 @@ write.csv(adres, "adres.csv")
 clean_data_v3 <- clean_data_v2_1 %>% group_by(reviewer_id, idshava) %>% summarise(score = mean(final_grade))
 n1 <- clean_data_v3 %>% group_by(reviewer_id, idshava) %>% summarise(n())
 
+# бд с уникальными параметрами шавермешных
+n2 <- unique(subset(clean_data_v2_1, select = c("idshava", "name", "photo","right_addres", "coord1", "coord2", "district")))
+n2 <- n2 %>% group_by(idshava) %>% summarize(n())
 n2 <- unique(subset(clean_data_v2_1, select = c("idshava", "name", "photo","right_addres", "coord1", "coord2", "district")))
 n2 <- as.data.frame(n2)
-
 n2[n2$idshava == 'id2144', ]
 n2 <- n2[-267,]
-
 rownames(n2) <- 1:nrow(n2)
-
 n2[n2$idshava == 'id1040', ]
 n2 <- n2[-290,]
-
-# n2 <- n2 %>% group_by(idshava) %>% summarize(n())
+unique_idshava <- n2
+write.csv(unique_idshava, "unique_idshava.csv")
 
 
 clean_data_v3 <- inner_join(clean_data_v3, n2, by = c("idshava"))
