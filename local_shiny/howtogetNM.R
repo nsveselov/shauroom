@@ -1,0 +1,5 @@
+full<-read.csv("~/shauroom/clean_data_v1.csv")
+nm = as.data.frame(unique(full$id_post))
+nm = cbind(c(1:720), nm)
+colnames(nm) <- c("number", "id_post")
+write.csv(nm,"~/shauroom/local_shiny/nm.csv")
