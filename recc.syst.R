@@ -1,11 +1,11 @@
 #Загрузка
-full<-read.csv("~/shauroom/clean_data_v1.csv")
+full<-read.csv("~/shauroom/clean_data_v3.csv")
 full$X.1<- NULL
 #MAKE MATRIX
 library(reshape2)
 library(recommenderlab)
 
-df <- as.data.frame(acast(full, reviewer_id~id_post, value.var="final_grade"))
+df <- as.data.frame(acast(full, reviewer_id~idshava, value.var="score"))
 df_matrix<-as.matrix(df)
 df_realm <- as(df_matrix, "realRatingMatrix")
 
