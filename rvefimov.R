@@ -300,7 +300,7 @@ clean_df_for_recommend$ <- NULL
 
 
 clean_df_for_recommend$final_grade <- as.numeric(clean_df_for_recommend$final_grade)
-write.csv(clean_df_for_recommend, 'clean_data_v1.csv')
+write.csv(clean_df_for_recommend, 'clean_data_v2.csv')
 
 
 # #### почистил от записей с повторениями reviewer_id и id_post
