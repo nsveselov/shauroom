@@ -12,6 +12,7 @@ library(scales)
 
 df_723_right_addresses <- read.csv('https://docs.google.com/spreadsheets/d/1xBtJrLZ_eCI9xWvYzjjvVHQCnP7g68y-eTnE1e9gGf8/pub?gid=403323493&single=true&output=csv', 
                                    stringsAsFactors=FALSE)
+
 shaverma_df_light <- read.csv("~/shauroom/shaverma_df_light.csv")
 
 test <- inner_join(shaverma_df_light, df_723_right_addresses, by = "id_post")
@@ -299,7 +300,7 @@ clean_df_for_recommend$coordinate <- NULL
 
 
 clean_df_for_recommend$final_grade <- as.numeric(clean_df_for_recommend$final_grade)
-write.csv(clean_df_for_recommend, 'clean_data_v2.csv')
+write.csv(clean_df_for_recommend, 'clean_data_v2.1.csv')
 
 
 # #### почистил от записей с повторениями reviewer_id и id_post
@@ -346,3 +347,24 @@ for (i in 643:nrow(adres)){
 }
 write.csv(adres, "adres.csv")
 
+######## переход к idshava ############
+
+clean_data_v3 <- clean_data_v2_1 %>% group_by(reviewer_id, idshava) %>% summarise(score = mean(final_grade))
+n1 <- clean_data_v3 %>% group_by(reviewer_id, idshava) %>% summarise(n())
+
+n2 <- unique(subset(clean_data_v2_1, select = c("idshava", "name", "photo","right_addres", "coord1", "coord2", "district")))
+n2 <- as.data.frame(n2)
+
+n2[n2$idshava == 'id2144', ]
+n2 <- n2[-267,]
+
+rownames(n2) <- 1:nrow(n2)
+
+n2[n2$idshava == 'id1040', ]
+n2 <- n2[-290,]
+
+# n2 <- n2 %>% group_by(idshava) %>% summarize(n())
+
+
+clean_data_v3 <- inner_join(clean_data_v3, n2, by = c("idshava"))
+write.csv(clean_data_v3, 'clean_data_v3.csv')
