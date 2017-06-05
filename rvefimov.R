@@ -10,7 +10,8 @@ library(scales)
 
 #### очистка и подготовка данных -- преокончательный вариант ####
 
-df_723_right_addresses <- read.csv("~/shauroom/723_correct_address.csv")
+df_723_right_addresses <- read.csv('https://docs.google.com/spreadsheets/d/1xBtJrLZ_eCI9xWvYzjjvVHQCnP7g68y-eTnE1e9gGf8/pub?gid=403323493&single=true&output=csv', 
+                                   stringsAsFactors=FALSE)
 shaverma_df_light <- read.csv("~/shauroom/shaverma_df_light.csv")
 
 test <- inner_join(shaverma_df_light, df_723_right_addresses, by = "id_post")
@@ -282,18 +283,21 @@ test_test[(test_test$post_score == 10.0) & (test_test$final_grade == NaN), ]$fin
 #### убрали чуваков с 1-им и 2-мя отзывами ####
 
 # удаление повторяющихся reviewer_id
-number_check <- test_test %>% group_by(reviewer_id,id_post) %>% summarise(n = n())
+test_test %>% group_by(reviewer_id,id_post) %>% summarise(n = n()) %>% filter(n > 1)
 test_test[(test_test$reviewer_id == 89195353) & (test_test$id_post == 33951), ]
-test_test <- test_test[-10381,]
-# test_test <- test_test[-10428,]
+test_test <- test_test[-10199,]
 
 # number <- clean_data_v1 %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 0) %>% group_by(n) %>% summarise(nn = n())
 number <- test_test %>% group_by(reviewer_id) %>% summarise(n = n()) %>% filter(n >= 3)
 
 clean_df_for_recommend <- inner_join(number, test_test, by = "reviewer_id")
 clean_df_for_recommend$n <- NULL
-clean_df_for_recommend$name <- NULL
+clean_df_for_recommend$address.x <- NULL
 clean_df_for_recommend$X <- NULL
+clean_df_for_recommend$Do <- NULL
+clean_df_for_recommend$coordinate <- NULL
+clean_df_for_recommend$ <- NULL
+
 
 clean_df_for_recommend$final_grade <- as.numeric(clean_df_for_recommend$final_grade)
 write.csv(clean_df_for_recommend, 'clean_data_v1.csv')
@@ -311,4 +315,41 @@ write.csv(clean_df_for_recommend, 'clean_data_v1.csv')
 # full<-full[-23532,]
 # full$X.1<-NULL
 # write.csv(full, "clean_data_v1.csv")
+
+######### загузка координат ###########
+adres <- read.csv('https://docs.google.com/spreadsheets/d/1xBtJrLZ_eCI9xWvYzjjvVHQCnP7g68y-eTnE1e9gGf8/pub?gid=403323493&single=true&output=csv', 
+                  stringsAsFactors=FALSE)
+library(httr)
+library("RCurl")
+library(jsonlite)
+library(stringr)
+
+for (i in 643:nrow(adres)){
+  print(i)
+  # url1 = paste0('http://catalog.api.2gis.ru/geo/search?q=Санкт-Петербург,+',  
+  #              gsub(" ", "+", adres[i,"right_addres"]),
+  #              '&version=1.3&key=rutnpt3272')
+  # adres[i,"address"] <- answer$result$name # address
+  # adres[i,"coordinate"] <- answer$result$centroid # coordinate
+  # if (length(answer$result$attributes$district) > 0){
+  #   adres[i,"district"] <- answer$result$attributes$district # district
+  url1 = paste0('https://catalog.api.2gis.ru/2.0/geo/search?page=1&page_size=1&q=Санкт-Петербург,+',
+                gsub(" ", "+", adres[i,"right_addres"]),
+                '&region_id=38&fields=search_attributes,items.address,items.adm_div,items.geometry.centroid,items.geometry.selection,items.geometry.style,items.floors,items.group&key=rutnpt3272')
+  answer <- fromJSON(getURL(url1))
+  adres[i,"address"] <- answer$result$items$full_name # address
+  adres[i,"coordinate"] <- answer$result$items$geometry$centroid # coordinate
+  adres[i,"coord1"] <- str_extract_all(answer$result$items$geometry$centroid, '\\d+.\\d+')[[1]][1]
+  adres[i,"coord2"] <- str_extract_all(answer$result$items$geometry$centroid, '\\d+.\\d+')[[1]][2]
+  if (length(answer$result$items$adm_div[[1]]$name[2]) > 0){
+    adres[i,"district"] <- answer$result$items$adm_div[[1]]$name[2] # district
+  }
+}
+write.csv(adres, "adres.csv")
+
+
+################# добавляем в таблицу координаты, районы, корректные адреса ###############
+subset(df_723_right_addresses, select = c("id_post", "idshava", "name", "coord1", "coord2", "photo", )
+
+clean_data_v2 <- inner_join(clean_data_v1, df_723_right_addresses, by = "id_post")
 
