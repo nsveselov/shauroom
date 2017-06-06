@@ -1,5 +1,9 @@
 library(leaflet)
 library(shiny)
+storage = clean_data_v3
+egarots = unique_idshava
+egarots$X <- NULL
+
 
 runApp(
   shinyApp(
@@ -9,15 +13,38 @@ runApp(
         # Copy this part here for the Script and disposal-div
         uiOutput("script"),
         tags$div(id = "garbage"),
+        tags$head(tags$script(type="text/javascript", src="//vk.com/js/api/openapi.js?146")),
         mainPanel(leafletOutput("map")),
         sidebarPanel(
           # не юзается
+          textOutput('text'),
+          actionButton("groups", "Паблосы"),
           # textOutput("Showcase"),
-          textOutput("summary"))
+          textOutput("hummary"),
+          textOutput("summary"),
+          tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
+          tags$div(id="vk_auth"),
+          tags$script(type="text/javascript",
+                      HTML("VK.Widgets.Auth('vk_auth',
+                           {authUrl: 'http://r.piterdata.ninja/p/5060/'});")))
+        # tags$script(type="text/javascript",
+        #             HTML("VK.Widgets.Auth('vk_auth', {onAuth: function(data)
+        #                  {alert('user '+data['uid']+' authorized');} });")))
+        
       )
     ),
     
     server = function(input, output, session){
+      
+      
+      # output$text <- renderText({
+      #   query <- parseQueryString(session$clientData$url_search)
+      #   paste(names(query), query, sep = "=", collapse=", ")
+      #   print(query$uid[1])
+      #   getURL(paste('https://api.vk.com/method/users.getSubscriptions?user_id=', query$uid[1], 
+      #                "&extended=0&fields=id,name", "&v=5.62", sep = ""))
+      #   
+      # })
       
       # Just for Show
       text <- NULL
@@ -26,23 +53,32 @@ runApp(
       makeReactiveBinding("text")
       output$Showcase <- renderText({text})
       
-      
       output$popup <- renderUI({tagList(
         sliderInput("ratesl", "Оцените шавермечную", min = 1, max = 5, value = 3),
         actionButton("rateac", "Подтвердить")
         # submitButton("Update View", icon("refresh"))
       )})
-      
       output$summary <- renderText({
         data = unique_idshava # загрузили данные
         event <- input$map_marker_click # считали нажатие на маркер
         input$rateac # нажатие на кнопку "Подтвердить" запускает скрипт
         name = data[data$idshava == event$id, "name"] # получаем название шавки
         address = data[data$idshava == event$id, "right_addres"] # получаем адрес шавки
+        isolate(egarots[egarots$idshava == event$id, "X"] <<- input$ratesl) # робит, но с ошибками
         paste0('id шавермешной: ', event$id, "\n",
                ', адрес: ', address,
                ', название: ', name,
-               ', оценка ', isolate(input$ratesl))}) # выводим текст
+               ', оценка ', isolate(input$ratesl)) # выводим текст
+        }) 
+      
+      output$hummary <- renderText({
+        if ((input$groups == 0) | (length(parseQueryString(session$clientData$url_search)) == 0))
+          return()
+        input$groups # нажатие на кнопку "Подтвердить" запускает скрипт
+        isolate(query <- parseQueryString(session$clientData$url_search))
+        isolate(getURL(paste('https://api.vk.com/method/users.getSubscriptions?user_id=', query$uid[1], 
+                                                 "&extended=0&fields=id,name", "&v=5.62", sep = ""))) # выводим текст
+      }) 
 
       
       
@@ -90,7 +126,7 @@ runApp(
       #   a = as.character(uiOutput(id))
       #   b = strsplit(a, " ")
       #   paste(b[[1]][1], b[[1]][2], "style='min-width:10000px;max-height:500px'", b[[1]][3])}
-      
+
       # рисуем карту
       data = unique_idshava
       output$map <- renderLeaflet({
@@ -103,6 +139,9 @@ runApp(
           addMarkers(~coord1, ~coord2, layerId = c(data$idshava),
                      popup = "<div id=\"popup\" style='min-width:10000px;max-height:500px'
                      class=\"shiny-html-output\"></div>")})
+      
+      
+
       
       }
         ), launch.browser = TRUE
