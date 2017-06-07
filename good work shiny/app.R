@@ -1,9 +1,6 @@
 library(leaflet)
 library(shiny)
-storage = clean_data_v3
-egarots = unique_idshava
-egarots$X <- NULL
-
+library(readr)
 
 runApp(
   shinyApp(
@@ -36,6 +33,12 @@ runApp(
     
     server = function(input, output, session){
       
+      #пихаем датку (надо переделать для паблиша?)
+      clean_data_v3 <- read_csv("~/shauroom/clean_data_v3.csv")
+      unique_idshava <- read_csv("~/shauroom/unique_idshava.csv")
+      storage = clean_data_v3
+      egarots = unique_idshava
+      egarots$X <- NULL
       
       # output$text <- renderText({
       #   query <- parseQueryString(session$clientData$url_search)
@@ -141,10 +144,10 @@ runApp(
                      class=\"shiny-html-output\"></div>")})
       
       
-
+      
       
       }
         ), launch.browser = TRUE
-      )
+)
 
 # https://rstudio.github.io/leaflet/shiny.html можно сделать карту на весь экран
