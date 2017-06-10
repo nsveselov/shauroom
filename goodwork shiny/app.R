@@ -2,39 +2,60 @@ library(leaflet)
 library(shiny)
 library(RCurl)
 library(readr)
-clean_data_v3 <- readr::read_csv("clean_data_v3.csv")
-unique_idshava <- readr::read_csv("unique_idshava.csv")
-storage = clean_data_v3
-egarots = unique_idshava
-egarots$X <- NA
+library(shinydashboard)
+library(googlesheets)
+#clean_data_v3 <- readr::read_csv("clean_data_v3.csv")
+#unique_idshava <- readr::read_csv("unique_idshava.csv")
+#storage = clean_data_v3
+#egarots = unique_idshava
+#egarots$X <- NA
+#write.csv(storage[,2:4], "storage.csv")
 
-ui = shinyUI(
-  fluidPage(
+storage <- readr::read_csv("storage.csv")
+egarots <- readr::read_csv("egarots.csv")
+
+body <- shinydashboard::dashboardBody(
+  fluidRow(
+    box(title='Map',
+        status = "primary",
+        uiOutput("script"),
+        tags$div(id = "garbage"),
+        tags$head(tags$script(type="text/javascript", src="//vk.com/js/api/openapi.js?146")),
+        mainPanel(leafletOutput("map")))
     
-    # Copy this part here for the Script and disposal-div
-    uiOutput("script"),
-    tags$div(id = "garbage"),
-    tags$head(tags$script(type="text/javascript", src="//vk.com/js/api/openapi.js?146")),
-    mainPanel(leafletOutput("map")),
-    sidebarPanel(
-      # не юзается
-      textOutput('text'),
-      actionButton("groups", "Паблосы"),
-      # textOutput("Showcase"),
-      textOutput("hummary"),
-      textOutput("summary"),
-      tags$script(HTML("")),
-      tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
-      tags$div(id="vk_auth"),
-      tags$script(type="text/javascript",
-                  HTML("VK.Widgets.Auth('vk_auth',
-                       {authUrl: 'https://vasilina11.shinyapps.io/goodworkshiny/'});")))
-    # tags$script(type="text/javascript",
-    #             HTML("VK.Widgets.Auth('vk_auth', {onAuth: function(data)
-    #                  {alert('user '+data['uid']+' authorized');} });")))
+  ),
+  fluidRow(
+    box(title='Авторизуйтесь',
+        sidebarPanel(
+          # не юзается
+          textOutput('text'),
+          solidHeader = TRUE,
+          collapsible = TRUE,
+          actionButton("groups", "Паблосы"),
+          # textOutput("Showcase"),
+          textOutput("hummary")
+       ),
+    box(title= 'Address',
+        textOutput("summary")),
     
-      )
+    box(tags$script(HTML("")),
+          tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
+          tags$div(id="vk_auth"),
+          tags$script(type="text/javascript",
+                      HTML("VK.Widgets.Auth('vk_auth',
+                           {authUrl: 'https://vasilina11.shinyapps.io/goodworkshiny/'});")))
+        # tags$script(type="text/javascript",
+        #             HTML("VK.Widgets.Auth('vk_auth', {onAuth: function(data)
+        #                  {alert('user '+data['uid']+' authorized');} });")))
+        
+    ))
+  )
+ui <- dashboardPage(
+  dashboardHeader(title = "Your shauroom"),
+  dashboardSidebar(),
+  body
 )
+
 
 server = function(input, output, session){
   
@@ -55,6 +76,7 @@ server = function(input, output, session){
   output$Showcase <- renderText({text})
   
   output$popup <- renderUI({tagList(
+    # address???
     sliderInput("ratesl", "Оцените шавермечную", min = 1, max = 5, value = 3),
     actionButton("rateac", "Подтвердить")
     # submitButton("Update View", icon("refresh"))
@@ -63,18 +85,36 @@ server = function(input, output, session){
   output$summary <- renderText({
     if (input$rateac == 0)
       return()
-    data = unique_idshava # загрузили данные
+    #data = unique_idshava # загрузили данные
     event <- input$map_marker_click # считали нажатие на маркер
     #input$rateac # нажатие на кнопку "Подтвердить" запускает скрипт
-    name = data[data$idshava == event$id, "name"] # получаем название шавки
-    address = data[data$idshava == event$id, "right_addres"] # получаем адрес шавки
-    isolate(egarots[egarots$idshava == event$id, "X"] <<- input$ratesl) # робит, но с ошибками
+    name = egarots[egarots$idshava == event$id, "name"] # получаем название шавки
+    address = egarots[egarots$idshava == event$id, "right_addres"] # получаем адрес шавки
+    #isolate(storage[storage$idshava == event$id, "X"] <<- input$ratesl) # робит, но с ошибками
+    storage<-read.csv("storage.csv")
+    if (nrow((storage[((storage$idshava == event$id) & 
+                  (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])), ])) == 0){
+    storage[nrow(storage)+1,] <- NA
+    isolate(storage[(nrow(storage)),"reviewer_id"] <- parseQueryString(session$clientData$url_search)$uid[1])
+    isolate(storage[(nrow(storage)),"idshava"] <- event$id)
+    isolate(storage[(nrow(storage)),"score"] <- input$ratesl)
+    }
+    else {
+    isolate(storage[((storage$idshava == event$id) & 
+                               (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])),"score"] <- input$ratesl)  
+    }
+    write.csv(storage,"storage.csv")
     paste0('id шавермешной: ', event$id, "\n",
            ', адрес: ', address,
            ', название: ', name,
-           ', оценка ', isolate(input$ratesl)) # выводим текст
+           ', оценка ', isolate(input$ratesl),
+           ' записанная оценка ', isolate((storage[((storage$idshava == event$id) & 
+                                             (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])), "score"])),
+           ' количество строк  ', nrow(storage) ) # выводим текст
+    
   }) 
   
+
   output$hummary <- renderText({
     if ((input$groups == 0) | (length(parseQueryString(session$clientData$url_search)) == 0))
       return()
@@ -132,16 +172,15 @@ server = function(input, output, session){
       #   paste(b[[1]][1], b[[1]][2], "style='min-width:10000px;max-height:500px'", b[[1]][3])}
       
       # рисуем карту
-      data = unique_idshava
       output$map <- renderLeaflet({
-        leaflet(data) %>%
+        leaflet(egarots) %>%
           addProviderTiles(providers$Stamen.TonerLite,
                            options = providerTileOptions(noWrap = TRUE)) %>% 
           ### первоначальный вариант (п. 2)
           #     addMarkers(~coord1, ~coord2, layerId = c(data$idshava),
           #                popup = lapply(paste0("popup", 1:3), popupMaker))})
-          addMarkers(~coord1, ~coord2, layerId = c(data$idshava),
-                     popup = "<div id=\"popup\" style='min-width:10000px;max-height:500px'
+          addMarkers(~coord1, ~coord2, layerId = c(egarots$idshava),
+                     popup = "<div id=\"popup\" style='min-width:100px;max-height:500px'
                      class=\"shiny-html-output\"></div>")})
       
       

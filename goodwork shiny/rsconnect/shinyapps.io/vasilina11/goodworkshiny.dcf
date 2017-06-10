@@ -3,8 +3,9 @@ title: goodworkshiny
 account: vasilina11
 server: shinyapps.io
 appId: 187555
-bundleId: 861121
+bundleId: 861238
 url: https://vasilina11.shinyapps.io/goodworkshiny/
-when: 1497098509.28988
+when: 1497106302.47222
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: app000.R
