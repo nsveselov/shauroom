@@ -4,6 +4,9 @@ library(RCurl)
 library(readr)
 library(shinydashboard)
 library(googlesheets)
+library(recommenderlab)
+library(reshape2)
+library(dplyr)
 #clean_data_v3 <- readr::read_csv("clean_data_v3.csv")
 #unique_idshava <- readr::read_csv("unique_idshava.csv")
 #storage = clean_data_v3
@@ -24,6 +27,7 @@ body <- shinydashboard::dashboardBody(
         mainPanel(leafletOutput("map")))
     
   ),
+  p(),
   fluidRow(
     box(title='Авторизуйтесь',
         sidebarPanel(
@@ -37,7 +41,11 @@ body <- shinydashboard::dashboardBody(
        ),
     box(title= 'Address',
         textOutput("summary")),
-    
+    p(),
+    box(title = 'Рекомендации',
+        actionButton("recs", "Рекомендовать"),
+        textOutput("recs")
+        ),
     box(tags$script(HTML("")),
           tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
           tags$div(id="vk_auth"),
@@ -77,7 +85,7 @@ server = function(input, output, session){
   
   output$popup <- renderUI({tagList(
     # address???
-    sliderInput("ratesl", "Оцените шавермечную", min = 1, max = 5, value = 3),
+    sliderInput("ratesl", "Оцените шавермечную", min = 1, max = 5, value = 3, step = 0.5),
     actionButton("rateac", "Подтвердить")
     # submitButton("Update View", icon("refresh"))
   )})
@@ -97,7 +105,7 @@ server = function(input, output, session){
     storage[nrow(storage)+1,] <- NA
     isolate(storage[(nrow(storage)),"reviewer_id"] <- parseQueryString(session$clientData$url_search)$uid[1])
     isolate(storage[(nrow(storage)),"idshava"] <- event$id)
-    isolate(storage[(nrow(storage)),"score"] <- input$ratesl)
+    isolate(storage[(nrow(storage)),"score"] <- (input$ratesl)*2)
     }
     else {
     isolate(storage[((storage$idshava == event$id) & 
@@ -114,6 +122,22 @@ server = function(input, output, session){
     
   }) 
   
+  output$recs <- renderText({
+    if (input$recs == 0)
+      return()
+    print("Выполняется...")
+    df <- as.data.frame(acast(storage, reviewer_id~idshava, value.var="score"))
+    matrix<-as.matrix(df)
+    realm <- as(matrix, "realRatingMatrix")
+    model<-Recommender(realm, method = "UBCF")
+    predicted <- predict(object=model, newdata=realm[(parseQueryString(session$clientData$url_search)$uid[1]),],n=5)
+    paste0('список шаверм: ', as(predicted, "list"))
+    shavas<-as.data.frame(as(predicted, "list"))
+    colnames(shavas)<- c("idshava")
+    shavas<-inner_join(shavas, egarots, by = "idshava")
+    paste('Адреса рекомендованной шавермы:')
+    paste0(shavas$right_addres,', ')
+  })
 
   output$hummary <- renderText({
     if ((input$groups == 0) | (length(parseQueryString(session$clientData$url_search)) == 0))
@@ -180,7 +204,7 @@ server = function(input, output, session){
           #     addMarkers(~coord1, ~coord2, layerId = c(data$idshava),
           #                popup = lapply(paste0("popup", 1:3), popupMaker))})
           addMarkers(~coord1, ~coord2, layerId = c(egarots$idshava),
-                     popup = "<div id=\"popup\" style='min-width:100px;max-height:500px'
+                     popup = "<div id=\"popup\" style='min-width:150px;max-height:500px'
                      class=\"shiny-html-output\"></div>")})
       
       
