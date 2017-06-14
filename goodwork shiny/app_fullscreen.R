@@ -4,6 +4,9 @@ library(RCurl)
 library(readr)
 library(shinydashboard)
 library(googlesheets)
+library(recommenderlab)
+library(reshape2)
+library(dplyr)
 #clean_data_v3 <- readr::read_csv("clean_data_v3.csv")
 #unique_idshava <- readr::read_csv("unique_idshava.csv")
 #storage = clean_data_v3
@@ -20,26 +23,21 @@ ui <- bootstrapPage(
   tags$div(id = "garbage"),
   tags$head(tags$script(type="text/javascript", src="//vk.com/js/api/openapi.js?146")),
   leafletOutput("map", width = "100%", height = "100%"),
-  absolutePanel(top = 5, right = 5,
+  absolutePanel(top = 10, right = 10,
                 box(sidebarPanel(
                       # не юзается
                       textOutput('text'),
                       solidHeader = TRUE,
                       collapsible = TRUE,
-                      actionButton("groups", "Паблосы"),
-                      # textOutput("Showcase"),
-                      textOutput("hummary")
+                      actionButton("recom", "Рекомендации")
                     )),
-                
-                box(textOutput("summary")
-                    ),
                 
                 box(tags$script(HTML("")),
                 tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
                 tags$div(id="vk_auth"),
                 tags$script(type="text/javascript",
                             HTML("VK.Widgets.Auth('vk_auth',
-                           {authUrl: 'http://r.piterdata.ninja/p/3689/'});")))))
+                           {authUrl: 'http://r.piterdata.ninja/p/6332/'});")))))
 
 server = function(input, output, session){
   
@@ -157,7 +155,8 @@ server = function(input, output, session){
       
       # рисуем карту
       output$map <- renderLeaflet({
-        leaflet(egarots) %>%
+        if (input$recom == 0){
+          leaflet(egarots) %>%
           addProviderTiles(providers$Stamen.TonerLite,
                            options = providerTileOptions(noWrap = TRUE)) %>% 
           ### первоначальный вариант (п. 2)
@@ -165,10 +164,25 @@ server = function(input, output, session){
           #                popup = lapply(paste0("popup", 1:3), popupMaker))})
           addMarkers(~coord1, ~coord2, layerId = c(egarots$idshava),
                      popup = "<div id=\"popup\" style='min-width:100px;max-height:500px'
-                     class=\"shiny-html-output\"></div>")})
+                     class=\"shiny-html-output\"></div>")
+        }
+        else{
+        df <- as.data.frame(acast(storage, reviewer_id~idshava, value.var="score"))
+        matrix<-as.matrix(df)
+        realm <- as(matrix, "realRatingMatrix")
+        model<-Recommender(realm, method = "UBCF")
+        predicted <- predict(object=model, newdata=realm[(parseQueryString(session$clientData$url_search)$uid[1]),],n=5)
+        paste0('список шаверм: ', as(predicted, "list"))
+        shavas<-as.data.frame(as(predicted, "list"))
+        colnames(shavas)<- c("idshava")
+        shavas<-inner_join(shavas, egarots, by = "idshava")
+        leaflet(shavas) %>%
+          addProviderTiles(providers$Stamen.TonerLite,
+                           options = providerTileOptions(noWrap = TRUE)) %>%
+          addMarkers(~coord1, ~coord2, layerId = c(shavas$idshava),
+                     popup = print(shavas$right_adress))
+        }
+        })
       
-      
-      
-      
-      }
+        }
 shinyApp(ui=ui, server=server)
