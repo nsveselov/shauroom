@@ -36,6 +36,8 @@ ui <- bootstrapPage(
                                          HTML("VK.Widgets.Auth('vk_auth',
                            {authUrl: 'https://vasilina11.shinyapps.io/goodwork16/'});")),
                              actionButton("recommand", "Рекомендовать"),
+                             actionButton("top10", "Топ-10"),
+                             actionButton("top30", "Топ-30"),
                              textOutput("summary")
                              
                 )))
@@ -218,6 +220,39 @@ server = function(input, output, session){
   }
   )
   
+  observeEvent(input$top10, {
+    top <- storage %>%
+      group_by(idshava) %>%
+      dplyr::summarise(ascore = mean(score), n = n()) %>%
+      filter(n >= 10) %>%
+      select(-n) %>%
+      filter(rank(desc(ascore))<=10) %>%
+      inner_join(egarots, by = "idshava")
+    
+    leafletProxy("map") %>%
+      setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
+      clearMarkers() %>%
+      addAwesomeMarkers(top$coord1, top$coord2, layerId = c(top$idshava), icon = icons,
+                        popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+                        class=\"shiny-html-output\"></div>")
+  })
+  
+  observeEvent(input$top30, {
+    top <- storage %>%
+      group_by(idshava) %>%
+      dplyr::summarise(ascore = mean(score), n = n()) %>%
+      filter(n >= 10) %>%
+      select(-n) %>%
+      filter(rank(desc(ascore))<=30) %>%
+      inner_join(egarots, by = "idshava")
+    
+    leafletProxy("map") %>%
+      setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
+      clearMarkers() %>%
+      addAwesomeMarkers(top$coord1, top$coord2, layerId = c(top$idshava), icon = icons,
+                        popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+                        class=\"shiny-html-output\"></div>")
+  })
   }
 shinyApp(ui=ui, server=server)
 
