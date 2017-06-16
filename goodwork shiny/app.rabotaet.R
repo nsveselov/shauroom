@@ -62,12 +62,12 @@ server = function(input, output, session){
   output$Showcase <- renderText({text}) #?
   
   output$popup <- renderUI({tagList(
-    # address???
+    HTML(paste(egarots[egarots$idshava == input$map_marker_click$id, "name"], 
+               egarots[egarots$idshava == input$map_marker_click$id, "right_addres"], sep = "<br/>")),
     sliderInput("ratesl", "Оцените шавермечную", min = 0, max = 5, value = 2.5, step = 0.5),
-    actionButton("rateac", "Подтвердить")
-    # submitButton("Update View", icon("refresh"))
+    HTML(paste("<center>", actionButton("rateac", "Подтвердить"), "</center>"))
   )})
-
+  
   
   output$summary <- renderText({
     if (input$rateac == 0)
@@ -80,15 +80,15 @@ server = function(input, output, session){
     #isolate(storage[storage$idshava == event$id, "X"] <<- input$ratesl) # робит, но с ошибками
     storage<-read.csv("storage.csv")
     if (nrow((storage[((storage$idshava == event$id) & 
-                  (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])), ])) == 0){
-    storage[nrow(storage)+1,] <- NA
-    isolate(storage[(nrow(storage)),"reviewer_id"] <- parseQueryString(session$clientData$url_search)$uid[1])
-    isolate(storage[(nrow(storage)),"idshava"] <- event$id)
-    isolate(storage[(nrow(storage)),"score"] <- (input$ratesl)*2)
+                       (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])), ])) == 0){
+      storage[nrow(storage)+1,] <- NA
+      isolate(storage[(nrow(storage)),"reviewer_id"] <- parseQueryString(session$clientData$url_search)$uid[1])
+      isolate(storage[(nrow(storage)),"idshava"] <- event$id)
+      isolate(storage[(nrow(storage)),"score"] <- (input$ratesl)*2)
     }
     else {
-    isolate(storage[((storage$idshava == event$id) & 
-                               (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])),"score"] <- input$ratesl)  
+      isolate(storage[((storage$idshava == event$id) & 
+                         (storage$reviewer_id == parseQueryString(session$clientData$url_search)$uid[1])),"score"] <- input$ratesl)  
     }
     write.csv(storage,"storage.csv", row.names = F)
     storage <- readr::read_csv("storage.csv")
@@ -98,7 +98,7 @@ server = function(input, output, session){
     a <- realm[parseQueryString(session$clientData$url_search)$uid[1],]
     paste("У нас есть столько твоих оценок: " , nrow(as(a, "data.frame")))
   }) 
-
+  
   output$hummary <- renderText({
     if ((input$groups == 0) | (length(parseQueryString(session$clientData$url_search)) == 0))
       return()
@@ -146,92 +146,92 @@ server = function(input, output, session){
                      
                      observer.observe(target, config);
                      '))})
-      
-      #tags$script(HTML('alert(document.URL)'))
-      ### первоначальный вариант (п. 1)      
-      ### код для вставки попапов
-      # popupMaker <- function(id){
-      #   a = as.character(uiOutput(id))
-      #   b = strsplit(a, " ")
-      #   paste(b[[1]][1], b[[1]][2], "style='min-width:10000px;max-height:500px'", b[[1]][3])}
   
-      # рисуем карту
- 
-      output$map <- renderLeaflet({
-        egarots$reco <- 0
-        
-        #цвета
-        getColor <- function(egarots) {
-          sapply(egarots$reco, function(reco) {
-            if(reco == 1) {
-              "green"
-            } 
-            else {
-              "blue"
-            } })
-        }
-        
-        #иконы
-        icons <- awesomeIcons(
-          icon = 'food',
-          iconColor = 'black',
-          library = 'ion',
-          markerColor = getColor(egarots))
-        
-        
-          leaflet(egarots) %>%
-            addProviderTiles(providers$Stamen.TonerLite,
-                             options = providerTileOptions(noWrap = TRUE)) %>% 
-            ### первоначальный вариант (п. 2)
-            #     addMarkers(~coord1, ~coord2, layerId = c(data$idshava),
-            #                popup = lapply(paste0("popup", 1:3), popupMaker))})
-            addAwesomeMarkers(~coord1, ~coord2, layerId = c(egarots$idshava), icon = icons,
-                       popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
-                     class=\"shiny-html-output\"></div>")
-        })
-      
-      observeEvent(input$recommand, {
-        storage <- readr::read_csv("storage.csv")
-        df <- as.data.frame(acast(storage, reviewer_id~idshava, value.var="score")) %>%
-          as.matrix() %>%
-          as("realRatingMatrix")
-        model <- Recommender(df, method = "UBCF")
-        predicted <- predict(object=model, newdata=df[parseQueryString(session$clientData$url_search)$uid[1],],n=5)
-        shavas<-as.data.frame(as(predicted, "list"))
-        colnames(shavas)<- c("idshava")
-        egarots$reco = 0
-        egarots[(egarots$idshava == shavas$idshava[1]) |
-                  (egarots$idshava == shavas$idshava[2]) | 
-                  (egarots$idshava == shavas$idshava[3]) |
-                  (egarots$idshava == shavas$idshava[4]) |
-                  (egarots$idshava == shavas$idshava[5]), "reco"] <- 1
-        
-        #цвета
-        getColor <- function(egarots) {
-          sapply(egarots$reco, function(reco) {
-            if(reco == 1) {
-              "green"
-            } 
-            else {
-              "blue"
-            } })
-        }
-        
-        #иконы
-        icons <- awesomeIcons(
-          icon = 'food',
-          iconColor = 'black',
-          library = 'ion',
-          markerColor = getColor(egarots))
-        
-        
-        leafletProxy("map") %>%
-          clearMarkers() %>%
-          addAwesomeMarkers(egarots$coord1, egarots$coord2, layerId = c(egarots$idshava), icon = icons,
-                            popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
-                     class=\"shiny-html-output\"></div>")
-      }
-      )
-
-      }
+  #tags$script(HTML('alert(document.URL)'))
+  ### первоначальный вариант (п. 1)      
+  ### код для вставки попапов
+  # popupMaker <- function(id){
+  #   a = as.character(uiOutput(id))
+  #   b = strsplit(a, " ")
+  #   paste(b[[1]][1], b[[1]][2], "style='min-width:10000px;max-height:500px'", b[[1]][3])}
+  
+  # рисуем карту
+  
+  output$map <- renderLeaflet({
+    egarots$reco <- 0
+    
+    #цвета
+    getColor <- function(egarots) {
+      sapply(egarots$reco, function(reco) {
+        if(reco == 1) {
+          "green"
+        } 
+        else {
+          "blue"
+        } })
+    }
+    
+    #иконы
+    icons <- awesomeIcons(
+      icon = 'food',
+      iconColor = 'black',
+      library = 'ion',
+      markerColor = getColor(egarots))
+    
+    
+    leaflet(egarots) %>%
+      addProviderTiles(providers$Stamen.TonerLite,
+                       options = providerTileOptions(noWrap = TRUE)) %>% 
+      setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
+      addAwesomeMarkers(~coord1, ~coord2, layerId = c(egarots$idshava), icon = icons,
+                        popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+                        class=\"shiny-html-output\"></div>")
+  })
+  
+  observeEvent(input$recommand, {
+    storage <- readr::read_csv("storage.csv")
+    df <- as.data.frame(acast(storage, reviewer_id~idshava, value.var="score")) %>%
+      as.matrix() %>%
+      as("realRatingMatrix")
+    model <- Recommender(df, method = "UBCF")
+    predicted <- predict(object=model, newdata=df[parseQueryString(session$clientData$url_search)$uid[1],],n=5)
+    shavas<-as.data.frame(as(predicted, "list"))
+    colnames(shavas)<- c("idshava")
+    egarots$reco = 0
+    egarots[(egarots$idshava == shavas$idshava[1]) |
+              (egarots$idshava == shavas$idshava[2]) | 
+              (egarots$idshava == shavas$idshava[3]) |
+              (egarots$idshava == shavas$idshava[4]) |
+              (egarots$idshava == shavas$idshava[5]), "reco"] <- 1
+    
+    #цвета
+    getColor <- function(egarots) {
+      sapply(egarots$reco, function(reco) {
+        if(reco == 1) {
+          "green"
+        } 
+        else {
+          "blue"
+        } })
+    }
+    
+    #иконы
+    icons <- awesomeIcons(
+      icon = 'food',
+      iconColor = 'black',
+      library = 'ion',
+      markerColor = getColor(egarots))
+    
+    
+    leafletProxy("map") %>%
+      setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
+      clearMarkers() %>%
+      addAwesomeMarkers(egarots$coord1, egarots$coord2, layerId = c(egarots$idshava), icon = icons,
+                        popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+                        class=\"shiny-html-output\"></div>")
+  }
+  )
+  
+  }
 shinyApp(ui=ui, server=server)
+

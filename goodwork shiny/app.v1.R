@@ -19,7 +19,6 @@ egarots <- readr::read_csv("egarots.csv")
 
 # body <- shinydashboard::dashboardBody(
 #   fluidRow(
-#     box(title='Map',
 #         status = "primary",
 #         uiOutput("script"),
 #         tags$div(id = "garbage"),
