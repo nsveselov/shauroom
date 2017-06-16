@@ -89,7 +89,7 @@ ui <- bootstrapPage(
                   tags$div(id="vk_auth"),
                   tags$script(type="text/javascript",
                               HTML("VK.Widgets.Auth('vk_auth',
-                           {authUrl: 'http://r.piterdata.ninja/p/6372/'});"))
+                           {authUrl: 'http://r.piterdata.ninja/p/4405/'});"))
                 )))
 
 server = function(input, output, session){
@@ -221,7 +221,7 @@ server = function(input, output, session){
       output$map <- renderLeaflet({
         
         if (input$recommand == 0) {
-          egarots$reco = 0
+          egarots$reco <- 0
         }
         
         
@@ -233,8 +233,12 @@ server = function(input, output, session){
           predicted <- predict(object=model, newdata=df[parseQueryString(session$clientData$url_search)$uid[1],],n=5)
           shavas<-as.data.frame(as(predicted, "list"))
           colnames(shavas)<- c("idshava")
-          shavas$reco = 1
-          egarots <- left_join(egarots, shavas, by = "idshava")
+          egarots$reco = 0
+          egarots[(egarots$idshava == shavas$idshava[1]) |
+                    (egarots$idshava == shavas$idshava[2]) | 
+                    (egarots$idshava == shavas$idshava[3]) |
+                    (egarots$idshava == shavas$idshava[4]) |
+                    (egarots$idshava == shavas$idshava[5]), "reco"] <- 1
         }
         
         #цвета
