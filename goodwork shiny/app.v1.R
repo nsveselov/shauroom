@@ -79,6 +79,7 @@ ui <- bootstrapPage(
                   # не юзается
                   textOutput('text'), #?
                   textOutput("summary"),
+                  fixed = TRUE,
                   solidHeader = TRUE,
                   collapsible = TRUE,
                   actionButton("recs", "Рекомендовать"),
@@ -115,8 +116,10 @@ server = function(input, output, session){
   
   output$popup <- renderUI({tagList(
     # address???
-    sliderInput("ratesl", "Оцените шавермечную", min = 0, max = 10, value = 5, step = 0.5),
-    actionButton("rateac", "Подтвердить")
+    HTML(paste(egarots[egarots$idshava == input$map_marker_click$id, "name"], 
+          egarots[egarots$idshava == input$map_marker_click$id, "right_addres"], sep="<br/>")),
+    sliderInput("ratesl", "Оцените шавермечную", min = 1, max = 5, value = 3, step = 0.5),
+    HTML(paste("<center>", actionButton("rateac", "Подтвердить"), "</center>"))
     # submitButton("Update View", icon("refresh"))
   )})
   
@@ -265,15 +268,16 @@ server = function(input, output, session){
         leaflet(egarots) %>%
           addProviderTiles(providers$Stamen.TonerLite,
                            options = providerTileOptions(noWrap = TRUE)) %>% 
+          setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
           ### первоначальный вариант (п. 2)
           #     addMarkers(~coord1, ~coord2, layerId = c(data$idshava),
           #                popup = lapply(paste0("popup", 1:3), popupMaker))})
           addMarkers(~coord1, ~coord2, layerId = c(egarots$idshava),
                      popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
-                     class=\"shiny-html-output\"></div>")})
+                     class=\"shiny-html-output\"></div>")}) 
       
       
       
-      
+       
       }
 shinyApp(ui=ui, server=server)
