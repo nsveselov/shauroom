@@ -89,7 +89,7 @@ ui <- bootstrapPage(
                   tags$div(id="vk_auth"),
                   tags$script(type="text/javascript",
                               HTML("VK.Widgets.Auth('vk_auth',
-                           {authUrl: 'http://r.piterdata.ninja/p/4405/'});"))
+                           {authUrl: 'http://r.piterdata.ninja/p/6372/'});"))
                 )))
 
 server = function(input, output, session){
@@ -219,27 +219,7 @@ server = function(input, output, session){
       # рисуем карту
  
       output$map <- renderLeaflet({
-        
-        if (input$recommand == 0) {
-          egarots$reco <- 0
-        }
-        
-        
-        else {
-          df <- as.data.frame(acast(storage, reviewer_id~idshava, value.var="score")) %>%
-            as.matrix() %>%
-            as("realRatingMatrix")
-          model <- Recommender(df, method = "UBCF")
-          predicted <- predict(object=model, newdata=df[parseQueryString(session$clientData$url_search)$uid[1],],n=5)
-          shavas<-as.data.frame(as(predicted, "list"))
-          colnames(shavas)<- c("idshava")
-          egarots$reco = 0
-          egarots[(egarots$idshava == shavas$idshava[1]) |
-                    (egarots$idshava == shavas$idshava[2]) | 
-                    (egarots$idshava == shavas$idshava[3]) |
-                    (egarots$idshava == shavas$idshava[4]) |
-                    (egarots$idshava == shavas$idshava[5]), "reco"] <- 1
-        }
+        egarots$reco <- 0
         
         #цвета
         getColor <- function(egarots) {
@@ -251,7 +231,6 @@ server = function(input, output, session){
               "blue"
             } })
         }
-        
         
         #иконы
         recorots$reco[is.na(recorots$reco)] <- 0
@@ -272,6 +251,50 @@ server = function(input, output, session){
                        popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
                      class=\"shiny-html-output\"></div>")
         })
+      
+      observeEvent(input$recommand, {
+        
+        df <- as.data.frame(acast(storage, reviewer_id~idshava, value.var="score")) %>%
+          as.matrix() %>%
+          as("realRatingMatrix")
+        model <- Recommender(df, method = "UBCF")
+        predicted <- predict(object=model, newdata=df[parseQueryString(session$clientData$url_search)$uid[1],],n=5)
+        shavas<-as.data.frame(as(predicted, "list"))
+        colnames(shavas)<- c("idshava")
+        egarots$reco = 0
+        egarots[(egarots$idshava == shavas$idshava[1]) |
+                  (egarots$idshava == shavas$idshava[2]) | 
+                  (egarots$idshava == shavas$idshava[3]) |
+                  (egarots$idshava == shavas$idshava[4]) |
+                  (egarots$idshava == shavas$idshava[5]), "reco"] <- 1
+        
+        #цвета
+        getColor <- function(egarots) {
+          sapply(egarots$reco, function(reco) {
+            if(reco == 1) {
+              "green"
+            } 
+            else {
+              "blue"
+            } })
+        }
+        
+        #иконы
+        recorots$reco[is.na(recorots$reco)] <- 0
+        icons <- awesomeIcons(
+          icon = 'food',
+          iconColor = 'black',
+          library = 'ion',
+          markerColor = getColor(egarots))
+        
+        
+        leafletProxy("map") %>%
+          clearMarkers() %>%
+          addAwesomeMarkers(egarots$coord1, egarots$coord2, layerId = c(egarots$idshava), icon = icons,
+                            popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+                     class=\"shiny-html-output\"></div>")
+      }
+      )
 
       }
 shinyApp(ui=ui, server=server)
