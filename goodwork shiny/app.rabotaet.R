@@ -26,21 +26,18 @@ ui <- bootstrapPage(
   leafletOutput("map", width = "100%", height = "100%"),
   absolutePanel(top = 10, right = 10, width = 300,
                 sidebarPanel(width = 17,
-                  # не юзается
-                  solidHeader = TRUE,
-                  collapsible = TRUE,
-                  actionButton("recommand", "Рекомендовать"),
-                  actionButton("groups", "Паблосы"),
-                  textOutput("hummary"),
-                  textOutput("summary"),
-                  actionButton("countscoreb", "Сколько ты оценил?"),
-                  textOutput("countscoret"),
-                  tags$script(HTML("")),
-                  tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
-                  tags$div(id="vk_auth"),
-                  tags$script(type="text/javascript",
-                              HTML("VK.Widgets.Auth('vk_auth',
-                           {authUrl: 'https://vasilina11.shinyapps.io/goodwork16/'});"))
+                             # не юзается
+                             solidHeader = TRUE,
+                             collapsible = TRUE,
+                             tags$script(HTML("")),
+                             tags$script(type="text/javascript", HTML("VK.init({apiId: 6063999});")),
+                             tags$div(id="vk_auth"),
+                             tags$script(type="text/javascript",
+                                         HTML("VK.Widgets.Auth('vk_auth',
+                           {authUrl: 'https://vasilina11.shinyapps.io/goodwork16/'});")),
+                             actionButton("recommand", "Рекомендовать"),
+                             textOutput("summary")
+                             
                 )))
 
 server = function(input, output, session){
@@ -98,17 +95,6 @@ server = function(input, output, session){
     a <- realm[parseQueryString(session$clientData$url_search)$uid[1],]
     paste("У нас есть столько твоих оценок: " , nrow(as(a, "data.frame")))
   }) 
-  
-  output$hummary <- renderText({
-    if ((input$groups == 0) | (length(parseQueryString(session$clientData$url_search)) == 0))
-      return()
-    input$groups # нажатие на кнопку "Подтвердить" запускает скрипт
-    isolate(query <- parseQueryString(session$clientData$url_search))
-    isolate(getURL(paste('https://api.vk.com/method/users.getSubscriptions?user_id=', query$uid[1], 
-                         "&extended=0&fields=id,name", "&v=5.62", sep = ""))) # выводим текст
-  }) 
-  
-  
   
   ### тоже рабочий вариант
   # observeEvent(input$Go2, {text <<- paste0(text, "\n", input$dynamic)})
