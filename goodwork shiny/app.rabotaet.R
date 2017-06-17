@@ -34,8 +34,9 @@ ui <- bootstrapPage(
                              tags$div(id="vk_auth"),
                              tags$script(type="text/javascript",
                                          HTML("VK.Widgets.Auth('vk_auth',
-                           {authUrl: 'https://vasilina11.shinyapps.io/goodwork16/'});")),
+                           {authUrl: 'http://r.piterdata.ninja/p/7334/'});")),
                              actionButton("recommand", "Рекомендовать"),
+                             checkboxInput("onlyrec", "Показать только рекомендации", value = FALSE),
                              actionButton("top10", "Топ-10"),
                              actionButton("top30", "Топ-30"),
                              textOutput("summary")
@@ -145,36 +146,31 @@ server = function(input, output, session){
   
   # рисуем карту
   
-  output$map <- renderLeaflet({
-    egarots$reco <- 0
-    
-    #цвета
-    getColor <- function(egarots) {
-      sapply(egarots$reco, function(reco) {
-        if(reco == 1) {
-          "green"
-        } 
-        else {
-          "blue"
-        } })
-    }
-    
-    #иконы
-    icons <- awesomeIcons(
-      icon = 'food',
-      iconColor = 'black',
-      library = 'ion',
-      markerColor = getColor(egarots))
-    
-    
-    leaflet(egarots) %>%
-      addProviderTiles(providers$Stamen.TonerLite,
-                       options = providerTileOptions(noWrap = TRUE)) %>% 
-      setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
-      addAwesomeMarkers(~coord1, ~coord2, layerId = c(egarots$idshava), icon = icons,
-                        popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+  observeEvent(input$onlyrec, {
+    if (input$onlyrec == FALSE){
+      output$map <- renderLeaflet({
+        egarots$reco <- 0
+        
+        leaflet(egarots) %>%
+          addProviderTiles(providers$Stamen.TonerLite,
+                           options = providerTileOptions(noWrap = TRUE)) %>% 
+          setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
+          addAwesomeMarkers(~coord1, ~coord2, layerId = c(egarots$idshava),
+                            popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
                         class=\"shiny-html-output\"></div>")
-  })
+      })
+    }
+    else {
+      shavasonly <- inner_join(shavas, egarots, by = "idshava")
+      
+      leafletProxy("map") %>%
+        setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
+        clearMarkers() %>%
+        addAwesomeMarkers(shavasonly$coord1, shavasonly$coord2, layerId = c(shavasonly$idshava),
+                          popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
+                        class=\"shiny-html-output\"></div>")
+    }})
+  
   
   observeEvent(input$recommand, {
     storage <- readr::read_csv("storage.csv")
@@ -182,7 +178,7 @@ server = function(input, output, session){
       as.matrix() %>%
       as("realRatingMatrix")
     model <- Recommender(df, method = "UBCF")
-    predicted <- predict(object=model, newdata=df[parseQueryString(session$clientData$url_search)$uid[1],],n=5)
+    predicted <- predict(object=model, newdata=df[1020,],n=5)
     shavas<-as.data.frame(as(predicted, "list"))
     colnames(shavas)<- c("idshava")
     egarots$reco = 0
@@ -191,30 +187,11 @@ server = function(input, output, session){
               (egarots$idshava == shavas$idshava[3]) |
               (egarots$idshava == shavas$idshava[4]) |
               (egarots$idshava == shavas$idshava[5]), "reco"] <- 1
-    
-    #цвета
-    getColor <- function(egarots) {
-      sapply(egarots$reco, function(reco) {
-        if(reco == 1) {
-          "green"
-        } 
-        else {
-          "blue"
-        } })
-    }
-    
-    #иконы
-    icons <- awesomeIcons(
-      icon = 'food',
-      iconColor = 'black',
-      library = 'ion',
-      markerColor = getColor(egarots))
-    
-    
+   
     leafletProxy("map") %>%
       setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
       clearMarkers() %>%
-      addAwesomeMarkers(egarots$coord1, egarots$coord2, layerId = c(egarots$idshava), icon = icons,
+      addAwesomeMarkers(egarots$coord1, egarots$coord2, layerId = c(egarots$idshava),
                         popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
                         class=\"shiny-html-output\"></div>")
   }
@@ -232,7 +209,7 @@ server = function(input, output, session){
     leafletProxy("map") %>%
       setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
       clearMarkers() %>%
-      addAwesomeMarkers(top$coord1, top$coord2, layerId = c(top$idshava), icon = icons,
+      addAwesomeMarkers(top$coord1, top$coord2, layerId = c(top$idshava),
                         popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
                         class=\"shiny-html-output\"></div>")
   })
@@ -249,7 +226,7 @@ server = function(input, output, session){
     leafletProxy("map") %>%
       setView(lng = 30.307184, lat = 59.944156, zoom = 10) %>% 
       clearMarkers() %>%
-      addAwesomeMarkers(top$coord1, top$coord2, layerId = c(top$idshava), icon = icons,
+      addAwesomeMarkers(top$coord1, top$coord2, layerId = c(top$idshava),
                         popup = "<div id=\"popup\" style='min-width:250px;max-height:500px'
                         class=\"shiny-html-output\"></div>")
   })
